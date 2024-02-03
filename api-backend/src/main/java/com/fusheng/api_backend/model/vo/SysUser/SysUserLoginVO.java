@@ -1,4 +1,4 @@
-package com.fusheng.api_backend.model.vo.sysUser;
+package com.fusheng.api_backend.model.vo.SysUser;
 
 import lombok.Data;
 

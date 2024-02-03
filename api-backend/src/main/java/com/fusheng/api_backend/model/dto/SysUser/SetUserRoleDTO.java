@@ -1,4 +1,4 @@
-package com.fusheng.api_backend.model.dto.sysUser;
+package com.fusheng.api_backend.model.dto.SysUser;
 
 import lombok.Data;
 

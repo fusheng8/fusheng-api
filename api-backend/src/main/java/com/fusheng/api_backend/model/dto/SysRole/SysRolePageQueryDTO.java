@@ -1,4 +1,4 @@
-package com.fusheng.api_backend.model.dto.sysRole;
+package com.fusheng.api_backend.model.dto.SysRole;
 
 import com.fusheng.api_backend.model.common.PageQueryDTO;
 import lombok.Data;

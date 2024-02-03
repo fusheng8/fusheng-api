@@ -1,4 +1,4 @@
-package com.fusheng.api_backend.model.vo.sysUser;
+package com.fusheng.api_backend.model.vo.SysUser;
 
 import com.fusheng.api_backend.model.common.PageQueryVO;
 import com.fusheng.api_backend.model.entity.SysUser;

@@ -1,4 +1,4 @@
-package com.fusheng.api_backend.model.dto.sysUser;
+package com.fusheng.api_backend.model.dto.SysUser;
 
 import com.fusheng.api_backend.model.common.PageQueryDTO;
 import lombok.Data;

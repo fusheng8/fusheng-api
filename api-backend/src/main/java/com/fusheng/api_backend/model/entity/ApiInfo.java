@@ -87,6 +87,11 @@ public class ApiInfo {
     private Integer status;
 
     /**
+     * sdk
+     */
+    private String sdk;
+
+    /**
      * 是否删除(0-未删, 1-已删)
      */
     @TableLogic

@@ -8,12 +8,12 @@ import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.mapper.SysRoleMapper;
 import com.fusheng.api_backend.mapper.SysUserMapper;
-import com.fusheng.api_backend.model.dto.sysUser.SetUserRoleDTO;
-import com.fusheng.api_backend.model.dto.sysUser.SysUserLoginDTO;
-import com.fusheng.api_backend.model.dto.sysUser.SysUserPageQueryDTO;
+import com.fusheng.api_backend.model.dto.SysUser.SetUserRoleDTO;
+import com.fusheng.api_backend.model.dto.SysUser.SysUserLoginDTO;
+import com.fusheng.api_backend.model.dto.SysUser.SysUserPageQueryDTO;
 import com.fusheng.api_backend.model.entity.SysUser;
-import com.fusheng.api_backend.model.vo.sysUser.SysUserInfoVO;
-import com.fusheng.api_backend.model.vo.sysUser.SysUserLoginVO;
+import com.fusheng.api_backend.model.vo.SysUser.SysUserInfoVO;
+import com.fusheng.api_backend.model.vo.SysUser.SysUserLoginVO;
 import com.fusheng.api_backend.service.SysUserService;
 import com.fusheng.api_backend.utils.PasswordUtil;
 import com.google.gson.Gson;
@@ -85,6 +85,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (StringUtils.isNotBlank(sysUserPageQueryDTO.getUserStatus())) {
             queryWrapper.like("user_status",
                     sysUserPageQueryDTO.getUserStatus().equals("1") ? 1 : 0);
+        }
+        if (sysUserPageQueryDTO.getOrder()!=null&&StringUtils.isNotBlank(sysUserPageQueryDTO.getColumn())) {
+            switch (sysUserPageQueryDTO.getOrder()) {
+                case asc:
+                    queryWrapper.orderByAsc(sysUserPageQueryDTO.getColumn());
+                    break;
+                case desc:
+                    queryWrapper.orderByDesc(sysUserPageQueryDTO.getColumn());
+                    break;
+            }
         }
         Page<SysUser> page = sysUserMapper.selectPage(queryPage, queryWrapper);
         //脱敏
