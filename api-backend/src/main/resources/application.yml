@@ -2,7 +2,7 @@ spring:
   application:
     name: init
   datasource:
-    url: jdbc:mysql://localhost:3306/fusheng_init?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/fusheng_api?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -35,7 +35,7 @@ springdoc:
   group-configs:
     - group: 'default'
       paths-to-match: '/**'
-      packages-to-scan: com.fusheng.init.controller
+      packages-to-scan: com.fusheng.api_backend.controller
 # knife4j的增强配置，不需要增强可以不配
 knife4j:
   enable: true

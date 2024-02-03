@@ -50,6 +50,6 @@ public class SysUserInfoVO {
     /**
      * 状态
      */
-    private Byte userStatus;
+    private Integer userStatus;
 
 }

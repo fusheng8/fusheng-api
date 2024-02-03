@@ -55,13 +55,17 @@ public class SysUser {
     /**
     * 状态
     */
-    private Byte userStatus;
+    private Integer userStatus;
+    /**
+     * 积分
+     */
+    private Integer balance;
 
     /**
     * 是否删除(0-未删, 1-已删)
     */
     @TableLogic
-    private Byte isDeleted;
+    private Integer isDeleted;
 
     /**
     * 更新时间
