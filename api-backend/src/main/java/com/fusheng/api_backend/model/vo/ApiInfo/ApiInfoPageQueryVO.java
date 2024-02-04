@@ -2,6 +2,7 @@ package com.fusheng.api_backend.model.vo.ApiInfo;
 
 import com.fusheng.api_backend.model.common.PageQueryVO;
 import com.fusheng.api_backend.model.entity.ApiInfo;
+import com.fusheng.api_backend.model.entity.ApiInfoObject;
 import com.fusheng.api_backend.model.entity.SysRole;
 import lombok.Data;
 

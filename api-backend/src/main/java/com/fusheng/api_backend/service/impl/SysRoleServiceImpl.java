@@ -17,20 +17,20 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
    @Resource
     private SysRoleMapper sysRoleMapper;
     @Override
-    public Page<SysRole> pageQuery(SysRolePageQueryDTO sysRolePageQueryDTO) {
-        Page<SysRole> queryPage = new Page<>(sysRolePageQueryDTO.getCurrent(), sysRolePageQueryDTO.getPageSize());
+    public Page<SysRole> pageQuery(SysRolePageQueryDTO dto) {
+        Page<SysRole> queryPage = new Page<>(dto.getCurrent(), dto.getPageSize());
         QueryWrapper<SysRole> queryWrapper = new QueryWrapper<>();
-        if (StringUtils.isNotBlank(sysRolePageQueryDTO.getName())) {
-            queryWrapper.like("name", sysRolePageQueryDTO.getName());
+        if (StringUtils.isNotBlank(dto.getName())) {
+            queryWrapper.like("name", dto.getName());
         }
 
-        if (sysRolePageQueryDTO.getOrder()!=null&&StringUtils.isNotBlank(sysRolePageQueryDTO.getColumn())) {
-            switch (sysRolePageQueryDTO.getOrder()) {
+        if (dto.getOrder()!=null&&StringUtils.isNotBlank(dto.getColumn())) {
+            switch (dto.getOrder()) {
                 case asc:
-                    queryWrapper.orderByAsc(sysRolePageQueryDTO.getColumn());
+                    queryWrapper.orderByAsc(dto.getColumn());
                     break;
                 case desc:
-                    queryWrapper.orderByDesc(sysRolePageQueryDTO.getColumn());
+                    queryWrapper.orderByDesc(dto.getColumn());
                     break;
             }
         }

@@ -15,32 +15,32 @@ public interface SysUserService extends IService<SysUser> {
     /**
      * 登录用户
      *
-     * @param sysUserLoginDTO
+     * @param dto
      */
-    SysUserLoginVO login(SysUserLoginDTO sysUserLoginDTO);
+    SysUserLoginVO login(SysUserLoginDTO dto);
 
     /**
      * 分页查询用户
      *
-     * @param sysUserPageQueryDTO
+     * @param dto
      * @return
      */
-    Page<SysUser> pageQuery(SysUserPageQueryDTO sysUserPageQueryDTO);
+    Page<SysUser> pageQuery(SysUserPageQueryDTO dto);
 
 
     /**
      * 根据用户id列表查询角色名称列表
-     * @param roleStr
+     * @param dto
      * @return
      */
-    List<String> getRoleKeysByIds(String roleStr);
+    List<String> getRoleKeysByIds(String dto);
 
     /**
      * 设置用户角色
      *
-     * @param setUserRoleDTO
+     * @param dto
      */
-    void setUserRole(SetUserRoleDTO setUserRoleDTO);
+    void setUserRole(SetUserRoleDTO dto);
 
     /***
      * 根据id获取用户信息

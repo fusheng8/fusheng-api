@@ -8,8 +8,8 @@ import com.fusheng.api_backend.model.entity.SysRole;
 public interface SysRoleService extends IService<SysRole> {
     /**
      * 分页查询角色
-     * @param sysRolePageQueryDTO
+     * @param dto
      * @return
      */
-    Page<SysRole> pageQuery(SysRolePageQueryDTO sysRolePageQueryDTO);
+    Page<SysRole> pageQuery(SysRolePageQueryDTO dto);
 }

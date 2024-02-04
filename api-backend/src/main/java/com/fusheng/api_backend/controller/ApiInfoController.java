@@ -4,11 +4,9 @@ import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fusheng.api_backend.common.BaseResponse;
 import com.fusheng.api_backend.model.dto.ApiInfo.ApiInfoPageQueryDTO;
-import com.fusheng.api_backend.model.dto.SysUser.SysUserPageQueryDTO;
+import com.fusheng.api_backend.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
 import com.fusheng.api_backend.model.entity.ApiInfo;
-import com.fusheng.api_backend.model.entity.SysUser;
 import com.fusheng.api_backend.model.vo.ApiInfo.ApiInfoPageQueryVO;
-import com.fusheng.api_backend.model.vo.SysUser.SysUserPageQueryVO;
 import com.fusheng.api_backend.service.ApiInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,6 +45,13 @@ public class ApiInfoController {
     @GetMapping("/deleteByIds")
     public BaseResponse<Boolean> deleteByIds(@RequestParam List<Long> ids) {
         boolean res = apiInfoService.removeBatchByIds(ids);
+        return BaseResponse.success(res);
+    }
+
+    @Operation(summary = "保存或者更新接口信息")
+    @PostMapping("/saveOrUpdate")
+    public BaseResponse<Boolean> saveOrUpdate(@RequestBody ApiInfoSavaOrUpdateDTO dto) {
+        boolean res = apiInfoService.saveOrUpdateApiInfo(dto);
         return BaseResponse.success(res);
     }
 }

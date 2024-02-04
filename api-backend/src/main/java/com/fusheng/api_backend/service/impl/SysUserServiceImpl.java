@@ -37,9 +37,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private SysRoleMapper sysRoleMapper;
 
     @Override
-    public SysUserLoginVO login(SysUserLoginDTO sysUserLoginDTO) {
+    public SysUserLoginVO login(SysUserLoginDTO dto) {
         QueryWrapper<SysUser> sysUserQueryWrapper = new QueryWrapper<>();
-        sysUserQueryWrapper.eq("username", sysUserLoginDTO.getUsername());
+        sysUserQueryWrapper.eq("username", dto.getUsername());
         SysUser sysUser = sysUserMapper.selectOne(sysUserQueryWrapper);
         if (sysUser == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
@@ -47,7 +47,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
         //加密密码
 
-        String encryptPassword = PasswordUtil.encrypt(sysUserLoginDTO.getPassword());
+        String encryptPassword = PasswordUtil.encrypt(dto.getPassword());
         if (!sysUser.getPassword().equals(encryptPassword)) {
             throw new BusinessException(ErrorCode.PASSWORD_ERROR);
         }
@@ -57,10 +57,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return sysUserLoginVO;
     }
 
-    public List<String> getRoleKeysByIds(String roleStr) {
+    public List<String> getRoleKeysByIds(String dto) {
         //将角色id列表转换为字符串
         List<Long> roleIds = new ArrayList<>();
-        JsonParser.parseString(roleStr).getAsJsonArray().forEach(jsonElement -> {
+        JsonParser.parseString(dto).getAsJsonArray().forEach(jsonElement -> {
             roleIds.add(jsonElement.getAsLong());
         });
 
@@ -73,26 +73,26 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public Page<SysUser> pageQuery(SysUserPageQueryDTO sysUserPageQueryDTO) {
-        Page<SysUser> queryPage = new Page<>(sysUserPageQueryDTO.getCurrent(), sysUserPageQueryDTO.getPageSize());
+    public Page<SysUser> pageQuery(SysUserPageQueryDTO dto) {
+        Page<SysUser> queryPage = new Page<>(dto.getCurrent(), dto.getPageSize());
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
-        if (StringUtils.isNotBlank(sysUserPageQueryDTO.getUsername())) {
-            queryWrapper.like("username", sysUserPageQueryDTO.getUsername());
+        if (StringUtils.isNotBlank(dto.getUsername())) {
+            queryWrapper.like("username", dto.getUsername());
         }
-        if (StringUtils.isNotBlank(sysUserPageQueryDTO.getPhone())) {
-            queryWrapper.like("phone", sysUserPageQueryDTO.getPhone());
+        if (StringUtils.isNotBlank(dto.getPhone())) {
+            queryWrapper.like("phone", dto.getPhone());
         }
-        if (StringUtils.isNotBlank(sysUserPageQueryDTO.getUserStatus())) {
+        if (StringUtils.isNotBlank(dto.getUserStatus())) {
             queryWrapper.like("user_status",
-                    sysUserPageQueryDTO.getUserStatus().equals("1") ? 1 : 0);
+                    dto.getUserStatus().equals("1") ? 1 : 0);
         }
-        if (sysUserPageQueryDTO.getOrder()!=null&&StringUtils.isNotBlank(sysUserPageQueryDTO.getColumn())) {
-            switch (sysUserPageQueryDTO.getOrder()) {
+        if (dto.getOrder()!=null&&StringUtils.isNotBlank(dto.getColumn())) {
+            switch (dto.getOrder()) {
                 case asc:
-                    queryWrapper.orderByAsc(sysUserPageQueryDTO.getColumn());
+                    queryWrapper.orderByAsc(dto.getColumn());
                     break;
                 case desc:
-                    queryWrapper.orderByDesc(sysUserPageQueryDTO.getColumn());
+                    queryWrapper.orderByDesc(dto.getColumn());
                     break;
             }
         }
@@ -105,10 +105,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public void setUserRole(SetUserRoleDTO setUserRoleDTO) {
+    public void setUserRole(SetUserRoleDTO dto) {
         SysUser sysUser = new SysUser();
-        sysUser.setId(setUserRoleDTO.getUserId());
-        sysUser.setRoles(new Gson().toJson(setUserRoleDTO.getRoleIds()));
+        sysUser.setId(dto.getUserId());
+        sysUser.setRoles(new Gson().toJson(dto.getRoleIds()));
         sysUserMapper.updateById(sysUser);
     }
 

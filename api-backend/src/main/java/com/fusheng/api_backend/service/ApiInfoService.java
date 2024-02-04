@@ -3,15 +3,20 @@ package com.fusheng.api_backend.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fusheng.api_backend.model.dto.ApiInfo.ApiInfoPageQueryDTO;
+import com.fusheng.api_backend.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
 import com.fusheng.api_backend.model.entity.ApiInfo;
-import com.fusheng.api_backend.model.vo.ApiInfo.ApiInfoPageQueryVO;
 
 public interface ApiInfoService extends IService<ApiInfo> {
     /**
      * 分页查询
      *
-     * @param apiInfoPageQueryDTO
+     * @param dto
      * @return
      */
-    Page<ApiInfo> pageQuery(ApiInfoPageQueryDTO apiInfoPageQueryDTO);
+    Page<ApiInfo> pageQuery(ApiInfoPageQueryDTO dto);
+
+    /**
+     * 保存或者更新接口信息
+     */
+    boolean saveOrUpdateApiInfo(ApiInfoSavaOrUpdateDTO dto);
 }

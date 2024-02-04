@@ -1,20 +1,18 @@
 package com.fusheng.api_backend.model.entity;
 
-import java.util.Date;
-
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fusheng.api_backend.model.enums.RequestMethodEnum;
 import lombok.Data;
 
 /**
- * 接口信息
+ * api信息的对象版本（所有json字段转换成对象）
  */
 @Data
-public class ApiInfo {
+public class ApiInfoObject {
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -45,12 +43,12 @@ public class ApiInfo {
     /**
      * 接口请求参数
      */
-    private String requestParams;
+    private RequestParam requestParams;
 
     /**
      * 接口响应参数
      */
-    private String responseParams;
+    private ResponseParam responseParams;
 
     /**
      * 扣除积分数
@@ -65,7 +63,7 @@ public class ApiInfo {
     /**
      * 请求头
      */
-    private String requestHeader;
+    private RequestHeaderParam requestHeader;
 
     /**
      * 响应示例
@@ -86,34 +84,4 @@ public class ApiInfo {
      * sdk
      */
     private String sdk;
-
-    /**
-     * 是否删除(0-未删, 1-已删)
-     */
-    @TableLogic
-    private Byte isDeleted;
-
-    /**
-     * 创建人
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private String createBy;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
-
-    /**
-     * 更新人
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Long updateBy;
-
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date updateTime;
 }
