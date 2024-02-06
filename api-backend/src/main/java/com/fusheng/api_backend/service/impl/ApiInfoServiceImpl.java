@@ -51,15 +51,15 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
         ApiInfo apiInfo = new ApiInfo();
         BeanUtils.copyProperties(dto, apiInfo);
         apiInfo.setUserId(StpUtil.getLoginIdAsLong());
-        if (apiInfo.getResponseParams() != null)
+        if (dto.getResponseParams() != null)
             apiInfo.setResponseParams(new Gson().toJson(dto.getResponseParams()));
         else apiInfo.setResponseParams(null);
 
-        if (apiInfo.getRequestHeader() != null)
+        if (dto.getRequestHeader() != null)
             apiInfo.setRequestHeader(new Gson().toJson(dto.getRequestHeader()));
         else apiInfo.setRequestHeader(null);
 
-        if (apiInfo.getRequestParams() != null)
+        if (dto.getRequestParams() != null)
             apiInfo.setRequestParams(new Gson().toJson(dto.getRequestParams()));
         else apiInfo.setRequestParams(null);
 

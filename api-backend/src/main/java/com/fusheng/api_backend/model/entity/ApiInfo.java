@@ -1,5 +1,6 @@
 package com.fusheng.api_backend.model.entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.*;
@@ -10,6 +11,7 @@ import lombok.Data;
  * 接口信息
  */
 @Data
+@TableName(value = "api_info")
 public class ApiInfo {
     /**
      * id
@@ -97,13 +99,13 @@ public class ApiInfo {
      * 创建人
      */
     @TableField(fill = FieldFill.INSERT)
-    private String createBy;
+    private Long createBy;
 
     /**
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 更新人
@@ -115,5 +117,5 @@ public class ApiInfo {
      * 更新时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date updateTime;
+    private LocalDateTime updateTime;
 }

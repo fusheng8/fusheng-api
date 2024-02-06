@@ -3,6 +3,8 @@ package com.fusheng.api_backend.controller;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fusheng.api_backend.common.BaseResponse;
+import com.fusheng.api_backend.common.ErrorCode;
+import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.model.dto.ApiInfo.ApiInfoPageQueryDTO;
 import com.fusheng.api_backend.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
 import com.fusheng.api_backend.model.entity.ApiInfo;
@@ -53,5 +55,11 @@ public class ApiInfoController {
     public BaseResponse<Boolean> saveOrUpdate(@RequestBody ApiInfoSavaOrUpdateDTO dto) {
         boolean res = apiInfoService.saveOrUpdateApiInfo(dto);
         return BaseResponse.success(res);
+    }
+    @Operation(summary = "根据id查询")
+    @GetMapping("/queryById")
+    public BaseResponse<ApiInfo> queryById(Long id) {
+        if (id == null)throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        return BaseResponse.success(apiInfoService.getById(id));
     }
 }
