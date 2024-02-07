@@ -20,9 +20,9 @@ public class RequestParam {
     private String type;
 
     /**
-     * 示例值
+     * 请求类型 param|body
      */
-    private String exampleValue;
+    private String requestType;
 
     /**
      * 备注
