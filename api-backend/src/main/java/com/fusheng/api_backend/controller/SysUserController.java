@@ -70,23 +70,9 @@ public class SysUserController {
 
     @Operation(summary = "保存用户")
     @PostMapping("/save")
-    public BaseResponse<SysUser> save(@RequestBody SysUserSaveDTO sysUserSaveDTO) {
-        //权限校验 非管理员只能修改自己的信息
-        if (!StpUtil.hasRole("admin")&&
-                (sysUserSaveDTO.getId()!=null&&sysUserSaveDTO.getId() != StpUtil.getLoginIdAsLong())) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
-        SysUser user = new SysUser();
-        BeanUtils.copyProperties(sysUserSaveDTO, user);
-        if (StringUtils.isNoneEmpty(user.getPassword())) {
-            //密码加密
-            String password = PasswordUtil.encrypt(user.getPassword());
-            user.setPassword(password);
-        }
-        if (sysUserSaveDTO.getRoles()!=null){
-            user.setRoles(new Gson().toJson(sysUserSaveDTO.getRoles()));
-        }
-        sysUserService.saveOrUpdate(user);
+    public BaseResponse<SysUser> save(@RequestBody SysUserSaveDTO dto) {
+
+       SysUser user= sysUserService.saveOrUpdateUser(dto);
         return BaseResponse.success(user);
     }
 

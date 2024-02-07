@@ -62,6 +62,16 @@ public class SysUser {
     private Integer balance;
 
     /**
+     * AccessKey
+     */
+    private String accessKey;
+
+    /**
+     * SecretKey
+     */
+    private String secretKey;
+
+    /**
     * 是否删除(0-未删, 1-已删)
     */
     @TableLogic

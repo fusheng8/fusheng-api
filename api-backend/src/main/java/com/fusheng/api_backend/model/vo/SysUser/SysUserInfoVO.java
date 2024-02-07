@@ -52,4 +52,19 @@ public class SysUserInfoVO {
      */
     private Integer userStatus;
 
+    /**
+     * 积分
+     */
+    private Integer balance;
+
+    /**
+     * AccessKey
+     */
+    private String accessKey;
+
+    /**
+     * SecretKey
+     */
+    private String secretKey;
+
 }

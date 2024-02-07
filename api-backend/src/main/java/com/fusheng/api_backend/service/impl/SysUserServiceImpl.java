@@ -1,6 +1,7 @@
 package com.fusheng.api_backend.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -11,6 +12,7 @@ import com.fusheng.api_backend.mapper.SysUserMapper;
 import com.fusheng.api_backend.model.dto.SysUser.SetUserRoleDTO;
 import com.fusheng.api_backend.model.dto.SysUser.SysUserLoginDTO;
 import com.fusheng.api_backend.model.dto.SysUser.SysUserPageQueryDTO;
+import com.fusheng.api_backend.model.dto.SysUser.SysUserSaveDTO;
 import com.fusheng.api_backend.model.entity.SysUser;
 import com.fusheng.api_backend.model.vo.SysUser.SysUserInfoVO;
 import com.fusheng.api_backend.model.vo.SysUser.SysUserLoginVO;
@@ -124,5 +126,38 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         //脱敏
         sysUserInfoVO.setPassword(null);
         return sysUserInfoVO;
+    }
+
+    @Override
+    public SysUser saveOrUpdateUser(SysUserSaveDTO dto) {
+        //权限校验 非管理员只能修改自己的信息
+        if (!StpUtil.hasRole("admin")&&
+                (dto.getId()!=null&&dto.getId() != StpUtil.getLoginIdAsLong())) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        SysUser user = new SysUser();
+        BeanUtils.copyProperties(dto, user);
+        if (StringUtils.isNoneEmpty(user.getPassword())) {
+            //密码加密
+            String password = PasswordUtil.encrypt(user.getPassword());
+            user.setPassword(password);
+        }
+        if (dto.getRoles()!=null){
+            user.setRoles(new Gson().toJson(dto.getRoles()));
+        }
+
+        //生成AccessKey和SecretKey
+        if (dto.getId() == null) {
+            user.setAccessKey(RandomUtil.randomString(16));
+            user.setSecretKey(RandomUtil.randomString(32));
+        }
+
+        if (dto.getId() == null) {
+            sysUserMapper.insert(user);
+        } else {
+            sysUserMapper.updateById(user);
+        }
+
+        return user;
     }
 }

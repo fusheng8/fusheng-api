@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.fusheng.api_backend.model.dto.SysUser.SetUserRoleDTO;
 import com.fusheng.api_backend.model.dto.SysUser.SysUserLoginDTO;
 import com.fusheng.api_backend.model.dto.SysUser.SysUserPageQueryDTO;
+import com.fusheng.api_backend.model.dto.SysUser.SysUserSaveDTO;
 import com.fusheng.api_backend.model.entity.SysUser;
 import com.fusheng.api_backend.model.vo.SysUser.SysUserInfoVO;
 import com.fusheng.api_backend.model.vo.SysUser.SysUserLoginVO;
@@ -49,4 +50,12 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      */
     SysUserInfoVO getUserInfoById(long id);
+
+    /**
+     * 保存或更新用户
+     *
+     * @param dto
+     * @return
+     */
+    SysUser saveOrUpdateUser(SysUserSaveDTO dto);
 }
