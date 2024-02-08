@@ -122,4 +122,10 @@ public class SysUserController {
         sysUserService.updateById(user);
         return BaseResponse.success(sk);
     }
+    @Operation(summary = "重置SecretKey")
+    @GetMapping("/logout")
+    public BaseResponse logout() {
+        StpUtil.logout();
+        return BaseResponse.success();
+    }
 }

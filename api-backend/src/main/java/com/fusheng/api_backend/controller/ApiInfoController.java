@@ -24,13 +24,13 @@ public class ApiInfoController {
     @Resource
     private ApiInfoService apiInfoService;
 
+    @SaCheckRole("admin")
     @Operation(summary = "获取所有接口信息")
     @GetMapping("/getAllApiInfo")
     public BaseResponse<List<ApiInfo>> getAllApiInfo() {
         return BaseResponse.success(apiInfoService.list());
     }
 
-    @SaCheckRole("admin")
     @Operation(summary = "查询用户列表")
     @PostMapping("/list")
     public BaseResponse<ApiInfoPageQueryVO> list(@RequestBody ApiInfoPageQueryDTO apiInfoPageQueryDTO) {
@@ -43,6 +43,7 @@ public class ApiInfoController {
         return BaseResponse.success(vo);
     }
 
+    @SaCheckRole("admin")
     @Operation(summary = "批量删除接口信息")
     @GetMapping("/deleteByIds")
     public BaseResponse<Boolean> deleteByIds(@RequestParam List<Long> ids) {
@@ -50,12 +51,14 @@ public class ApiInfoController {
         return BaseResponse.success(res);
     }
 
+    @SaCheckRole("admin")
     @Operation(summary = "保存或者更新接口信息")
     @PostMapping("/saveOrUpdate")
     public BaseResponse<Boolean> saveOrUpdate(@RequestBody ApiInfoSavaOrUpdateDTO dto) {
         boolean res = apiInfoService.saveOrUpdateApiInfo(dto);
         return BaseResponse.success(res);
     }
+
     @Operation(summary = "根据id查询")
     @GetMapping("/queryById")
     public BaseResponse<ApiInfo> queryById(Long id) {
