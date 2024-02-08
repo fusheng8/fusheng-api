@@ -16,15 +16,13 @@
     <description>fusheng</description>
     <modules>
         <module>api-backend</module>
+        <module>api-gateway</module>
     </modules>
     <properties>
         <java.version>17</java.version>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
