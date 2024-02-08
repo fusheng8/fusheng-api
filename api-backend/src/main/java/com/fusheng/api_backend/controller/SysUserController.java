@@ -4,6 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fusheng.api_backend.common.BaseResponse;
 import com.fusheng.api_backend.common.ErrorCode;
@@ -108,5 +109,17 @@ public class SysUserController {
         SysUser user = sysUserService.getById(id);
         List<String> roleKeys = sysUserService.getRoleKeysByIds(user.getRoles());
         return BaseResponse.success(roleKeys);
+    }
+
+    @Operation(summary = "重置SecretKey")
+    @GetMapping("/resetSecretKey")
+    public BaseResponse<String> resetSecretKey() {
+        long id = StpUtil.getLoginIdAsLong();
+        SysUser user = sysUserService.getById(id);
+        if (user == null) throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        String sk = RandomUtil.randomString(32);
+        user.setSecretKey(sk);
+        sysUserService.updateById(user);
+        return BaseResponse.success(sk);
     }
 }
