@@ -17,3 +17,13 @@ logging:
       springframework:
         cloud:
           gateway: trace
+
+dubbo:
+  application:
+    name: api-gateway
+  protocol:
+    name: dubbo
+    port: 9566
+  registry:
+    id: nacos
+    address: nacos://localhost:8848

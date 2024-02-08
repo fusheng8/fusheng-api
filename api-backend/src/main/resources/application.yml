@@ -62,3 +62,13 @@ sa-token:
 fusheng:
   # 加密秘钥
   encrypt-key: 186cfa4cd57b
+
+dubbo:
+  application:
+    name: api-backend
+  protocol:
+    name: dubbo
+    port: 9565
+  registry:
+    id: nacos
+    address: nacos://localhost:8848
