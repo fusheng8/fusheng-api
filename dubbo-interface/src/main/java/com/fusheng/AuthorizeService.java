@@ -1,14 +1,15 @@
 package com.fusheng;
 
+import com.fusheng.common.model.entity.SysUser;
+
 public interface AuthorizeService {
+
     /**
-     * 检测是否有权限
+     * 根据accessKey获取用户信息
+     *
      * @param accessKey
-     * @param timestamp
-     * @param sign
-     * @param nonce
      * @return
      */
-    boolean authorize(String accessKey, String timestamp, String sign, String nonce);
+    SysUser getUserByAccessKey(String accessKey);
 
 }

@@ -20,48 +20,17 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Resource
     private SysUserMapper userMapper;
 
-    @Resource
-    private RedissonClient redissonClient;
-
-    public static final Long EXPIRE_TIME = 10 * 60 * 1000L;
-
     /**
-     * 检测是否有权限
+     * 根据accessKey获取用户信息
      *
      * @param accessKey
-     * @param timestamp
-     * @param sign
-     * @param nonce
      * @return
      */
     @Override
-    public boolean authorize(String accessKey, String timestamp, String sign, String nonce) {
+    public SysUser getUserByAccessKey(String accessKey) {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<SysUser>().eq("access_key", accessKey);
-        SysUser user = userMapper.selectOne(queryWrapper);
-        if (user == null) {
-            return false;
-        }
-        // 验证时间戳 10s内有效
-        if (DateTime.now().getTime() - Long.parseLong(timestamp) > EXPIRE_TIME) {
-            return false;
-        }
-
-        // 验证nonce
-        RBucket<String> bucket = redissonClient.getBucket(RedisName.NONCE + accessKey + ":" + nonce);
-        if (bucket.isExists()) {
-            return false;
-        } else {
-            // 保存nonce
-            bucket.set(nonce, EXPIRE_TIME, TimeUnit.MILLISECONDS);
-        }
-        return getSign(accessKey, timestamp, nonce).equals(sign);
+        return userMapper.selectOne(queryWrapper);
     }
 
-    /**
-     * 计算签名
-     */
-    private String getSign(String accessKey, String timestamp, String nonce) {
-        Digester sha1 = new Digester(DigestAlgorithm.SHA1);
-        return sha1.digestHex(accessKey + timestamp + nonce);
-    }
+
 }

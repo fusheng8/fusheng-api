@@ -25,10 +25,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+
         </dependencies>
 
     </dependencyManagement>
-
 
 
     <dependencies>
@@ -38,11 +39,14 @@
             <artifactId>dubbo-interface</artifactId>
             <version>1.0</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>3.19.3</version>
         </dependency>
     </dependencies>
 </project>
