@@ -2,13 +2,13 @@ package com.fusheng.api_backend.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.fusheng.api_backend.model.dto.SysUser.SetUserRoleDTO;
-import com.fusheng.api_backend.model.dto.SysUser.SysUserLoginDTO;
-import com.fusheng.api_backend.model.dto.SysUser.SysUserPageQueryDTO;
-import com.fusheng.api_backend.model.dto.SysUser.SysUserSaveDTO;
-import com.fusheng.api_backend.model.entity.SysUser;
-import com.fusheng.api_backend.model.vo.SysUser.SysUserInfoVO;
-import com.fusheng.api_backend.model.vo.SysUser.SysUserLoginVO;
+import com.fusheng.common.model.dto.SysUser.SetUserRoleDTO;
+import com.fusheng.common.model.dto.SysUser.SysUserLoginDTO;
+import com.fusheng.common.model.dto.SysUser.SysUserPageQueryDTO;
+import com.fusheng.common.model.dto.SysUser.SysUserSaveDTO;
+import com.fusheng.common.model.entity.SysUser;
+import com.fusheng.common.model.vo.SysUser.SysUserInfoVO;
+import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
 
 import java.util.List;
 

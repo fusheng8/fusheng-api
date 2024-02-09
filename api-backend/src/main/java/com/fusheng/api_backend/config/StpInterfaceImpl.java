@@ -1,7 +1,7 @@
 package com.fusheng.api_backend.config;
 
 import cn.dev33.satoken.stp.StpInterface;
-import com.fusheng.api_backend.model.entity.SysUser;
+import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.api_backend.service.SysRoleService;
 import com.fusheng.api_backend.service.SysUserService;
 import jakarta.annotation.Resource;

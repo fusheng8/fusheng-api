@@ -10,7 +10,8 @@ spring:
     redis:
       host: localhost
       port: 6379
-      database: 1
+      database: 3
+
 server:
   port: 8080
 
@@ -72,3 +73,4 @@ dubbo:
   registry:
     id: nacos
     address: nacos://localhost:8848
+

@@ -2,9 +2,9 @@ package com.fusheng.api_backend.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.fusheng.api_backend.model.dto.ApiInfo.ApiInfoPageQueryDTO;
-import com.fusheng.api_backend.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
-import com.fusheng.api_backend.model.entity.ApiInfo;
+import com.fusheng.common.model.dto.ApiInfo.ApiInfoPageQueryDTO;
+import com.fusheng.common.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
+import com.fusheng.common.model.entity.ApiInfo;
 
 public interface ApiInfoService extends IService<ApiInfo> {
     /**

@@ -3,6 +3,7 @@ package com.fusheng.api_gateway;
 import cn.hutool.core.collection.ListUtil;
 import com.fusheng.AuthorizeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -35,9 +36,17 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         String sign = headers.getFirst("Sign");
         String nonce = headers.getFirst("nonce");
 
-        log.info("结果{}",authorizeService.sayHello("fusheng"));
+        if (StringUtils.isAnyBlank(authorization, accessKey, timestamp, sign, nonce)) {
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return response.setComplete();
+        }
 
-        // ToDO: 计算签名判断是否放行
+        // 判断是否有权限
+        if (authorizeService.authorize(accessKey,timestamp,sign,nonce)){
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return response.setComplete();
+        }
+
         return chain.filter(exchange);
     }
 

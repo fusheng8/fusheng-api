@@ -1,7 +1,7 @@
 package com.fusheng.api_backend.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.fusheng.api_backend.model.entity.SysUser;
+import com.fusheng.common.model.entity.SysUser;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
