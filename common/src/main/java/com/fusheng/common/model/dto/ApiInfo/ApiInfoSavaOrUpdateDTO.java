@@ -48,7 +48,7 @@ public class ApiInfoSavaOrUpdateDTO {
     /**
      * 扣除积分数
      */
-    private Long reduceBalance;
+    private String reduceBalance;
 
     /**
      * 请求示例

@@ -9,6 +9,7 @@ import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.mapper.SysRoleMapper;
 import com.fusheng.api_backend.mapper.SysUserMapper;
+import com.fusheng.common.constant.RedisName;
 import com.fusheng.common.model.dto.SysUser.SetUserRoleDTO;
 import com.fusheng.common.model.dto.SysUser.SysUserLoginDTO;
 import com.fusheng.common.model.dto.SysUser.SysUserPageQueryDTO;
@@ -22,10 +23,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RBucket;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +42,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private SysUserMapper sysUserMapper;
     @Resource
     private SysRoleMapper sysRoleMapper;
+    @Resource
+    private RedissonClient redissonClient;
 
     @Override
     public SysUserLoginVO login(SysUserLoginDTO dto) {
@@ -159,5 +166,31 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
 
         return user;
+    }
+
+    @Override
+    public boolean deductUserBalance(long userId, boolean isAdd, String amount) {
+        // 对用户加锁
+        RLock lock = redissonClient.getLock(RedisName.USER_BALANCE_LOCK + userId);
+        lock.lock();
+        try {
+            SysUser user = sysUserMapper.selectById(userId);
+            // 判断余额是否足够
+            BigInteger bigInteger1 = new BigInteger(user.getBalance());
+            BigInteger bigInteger2 = new BigInteger(amount);
+            if (isAdd || bigInteger1.compareTo(bigInteger2) >= 0) {
+                if (isAdd) {
+                    user.setBalance(bigInteger1.add(bigInteger2).toString());
+                } else {
+                    user.setBalance(bigInteger1.subtract(bigInteger2).toString());
+                }
+                sysUserMapper.updateById(user);
+            } else {
+                return false;
+            }
+        } finally {
+            lock.unlock();
+        }
+        return true;
     }
 }

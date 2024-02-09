@@ -59,7 +59,7 @@ public class SysUser {
     /**
      * 积分
      */
-    private Integer balance;
+    private String balance;
 
     /**
      * AccessKey

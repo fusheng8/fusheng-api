@@ -15,7 +15,7 @@ public class ApiInfoPageQueryDTO extends PageQueryDTO {
     private String name;
 
     /**
-     * 接口费用
+     * 接口状态
      */
     private Integer status;
 

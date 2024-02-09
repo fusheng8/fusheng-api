@@ -3,33 +3,40 @@ package com.fusheng.api_gateway;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.crypto.digest.DigestAlgorithm;
 import cn.hutool.crypto.digest.Digester;
-import com.fusheng.AuthorizeService;
+import com.fusheng.GatewayService;
 import com.fusheng.common.constant.RedisName;
+import com.fusheng.common.model.entity.ApiInfo;
 import com.fusheng.common.model.entity.SysUser;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.reactivestreams.Publisher;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
 public class CustomGlobalFilter implements GlobalFilter, Ordered {
     @DubboReference
-    private AuthorizeService authorizeService;
+    private GatewayService gatewayService;
     @Resource
     private RedissonClient redissonClient;
     /**
@@ -41,6 +48,13 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
+        String uri = request.getURI().toString();
+
+        // 判断是否存在该接口
+        ApiInfo apiInfo = gatewayService.getApiInfoByApiUrl(uri.split("\\?")[0]);
+        if (apiInfo == null) {
+            return authenticateFailed(response);
+        }
 
         HttpHeaders headers = request.getHeaders();
         String authorization = headers.getFirst("Authorization");
@@ -54,30 +68,94 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         }
 
         // 判断是否有权限
-        SysUser user = authorizeService.getUserByAccessKey(accessKey);
-        if (user == null) {
+        SysUser user = gatewayService.getUserByAccessKey(accessKey);
+        if (user == null && !authenticate(authorization, accessKey, timestamp, sign, nonce)) {
             return authenticateFailed(response);
         }
+
+        BigInteger bigInteger1 = new BigInteger(user.getBalance());
+        BigInteger bigInteger2 = new BigInteger(apiInfo.getReduceBalance());
+
+        //判断是否积分足够（初次检测，先过滤一部分）
+        if (!"0".equals(apiInfo.getReduceBalance()) &&
+                bigInteger1.compareTo(bigInteger2) < 0) {
+            return authenticateFailed(response);
+        }
+
+
+        DataBufferFactory bufferFactory = response.bufferFactory();
+        HttpStatusCode statusCode = response.getStatusCode();
+
+
+        if (statusCode == HttpStatus.OK) {
+            ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(response) {
+
+                @Override
+                public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
+                    // ToDo 记录日志
+//                    if (body instanceof Flux) {
+//                        Flux<? extends DataBuffer> fluxBody = Flux.from(body);
+//                        //
+//                        return super.writeWith(fluxBody.map(dataBuffer -> {
+//                            byte[] content = new byte[dataBuffer.readableByteCount()];
+//                            dataBuffer.read(content);
+//                            DataBufferUtils.release(dataBuffer);//释放掉内存
+//                            // 构建日志
+//                            StringBuilder sb2 = new StringBuilder(200);
+//                            sb2.append("<--- {} {} \n");
+//                            List<Object> rspArgs = new ArrayList<>();
+//                            rspArgs.add(response.getStatusCode());
+//                            //rspArgs.add(requestUrl);
+//                            String data = new String(content, StandardCharsets.UTF_8);//data
+//                            sb2.append(data);
+//                            log.info("测试");
+//                            log.info(sb2.toString(), rspArgs.toArray());//log.info("<-- {} {}\n", originalResponse.getStatusCode(), data);
+//                            return bufferFactory.wrap(content);
+//                        }));
+//                    } else {
+//                        log.error("<--- {} 响应code异常", getStatusCode());
+//                    }
+
+                    //如果响应码是200，那么就扣积分
+                    if (statusCode == HttpStatus.OK) {
+                        if (!gatewayService.deductUserBalance(user.getId(), apiInfo.getReduceBalance())){
+                            //扣除积分失败
+                            return authenticateFailed(response);
+                        }
+                    }
+                    return super.writeWith(body);
+                }
+            };
+            return chain.filter(exchange.mutate().response(decoratedResponse).build());
+        }
+        return chain.filter(exchange);
+    }
+
+    /**
+     * 验证是否有权限
+     */
+    private boolean authenticate(String authorization, String accessKey, String timestamp, String sign, String nonce) {
+
+
         // 验证时间戳 10s内有效
         if (DateTime.now().getTime() - Long.parseLong(timestamp) > EXPIRE_TIME) {
-            return authenticateFailed(response);
+            return false;
         }
 
         // 验证nonce
         RBucket<String> bucket = redissonClient.getBucket(RedisName.NONCE + accessKey + ":" + nonce);
         if (bucket.isExists()) {
-            return authenticateFailed(response);
+            return false;
         } else {
             // 保存nonce
             bucket.set(nonce, EXPIRE_TIME, TimeUnit.MILLISECONDS);
         }
         if (getSign(accessKey, timestamp, nonce).equals(sign)) {
-            return authenticateFailed(response);
+            return false;
         }
-
-        // ToDo 判断请求结果决定是否扣除积分
-        return chain.filter(exchange);
+        return true;
     }
+
 
     /**
      * 认证失败

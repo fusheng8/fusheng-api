@@ -55,7 +55,7 @@ public class SysUserInfoVO {
     /**
      * 积分
      */
-    private Integer balance;
+    private String balance;
 
     /**
      * AccessKey

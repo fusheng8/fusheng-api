@@ -10,6 +10,7 @@ import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.vo.SysUser.SysUserInfoVO;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public interface SysUserService extends IService<SysUser> {
@@ -31,6 +32,7 @@ public interface SysUserService extends IService<SysUser> {
 
     /**
      * 根据用户id列表查询角色名称列表
+     *
      * @param dto
      * @return
      */
@@ -58,4 +60,14 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      */
     SysUser saveOrUpdateUser(SysUserSaveDTO dto);
+
+    /**
+     * 扣除用户余额
+     *
+     * @param userId
+     * @param isAdd
+     * @param amount
+     * @return
+     */
+    boolean deductUserBalance(long userId, boolean isAdd, String amount);
 }
