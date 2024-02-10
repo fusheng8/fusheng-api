@@ -9,6 +9,8 @@ import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.mapper.SysRoleMapper;
 import com.fusheng.api_backend.mapper.SysUserMapper;
+import com.fusheng.api_backend.service.SysUserService;
+import com.fusheng.api_backend.utils.PasswordUtil;
 import com.fusheng.common.constant.RedisName;
 import com.fusheng.common.model.dto.SysUser.SetUserRoleDTO;
 import com.fusheng.common.model.dto.SysUser.SysUserLoginDTO;
@@ -17,13 +19,10 @@ import com.fusheng.common.model.dto.SysUser.SysUserSaveDTO;
 import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.vo.SysUser.SysUserInfoVO;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
-import com.fusheng.api_backend.service.SysUserService;
-import com.fusheng.api_backend.utils.PasswordUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
-import org.redisson.api.RBucket;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
@@ -31,8 +30,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -95,7 +96,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             queryWrapper.like("user_status",
                     dto.getUserStatus().equals("1") ? 1 : 0);
         }
-        if (dto.getOrder()!=null&&StringUtils.isNotBlank(dto.getColumn())) {
+        if (dto.getOrder() != null && StringUtils.isNotBlank(dto.getColumn())) {
             switch (dto.getOrder()) {
                 case asc:
                     queryWrapper.orderByAsc(dto.getColumn());
@@ -138,8 +139,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public SysUser saveOrUpdateUser(SysUserSaveDTO dto) {
         //权限校验 非管理员只能修改自己的信息
-        if (!StpUtil.hasRole("admin")&&
-                (dto.getId()!=null&&dto.getId() != StpUtil.getLoginIdAsLong())) {
+        if (!StpUtil.hasRole("admin") &&
+                (dto.getId() != null && dto.getId() != StpUtil.getLoginIdAsLong())) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         SysUser user = new SysUser();
@@ -149,7 +150,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             String password = PasswordUtil.encrypt(user.getPassword());
             user.setPassword(password);
         }
-        if (dto.getRoles()!=null){
+        if (dto.getRoles() != null) {
             user.setRoles(new Gson().toJson(dto.getRoles()));
         }
 
@@ -172,24 +173,37 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public boolean deductUserBalance(long userId, boolean isAdd, String amount) {
         // 对用户加锁
         RLock lock = redissonClient.getLock(RedisName.USER_BALANCE_LOCK + userId);
-        lock.lock();
         try {
-            SysUser user = sysUserMapper.selectById(userId);
-            // 判断余额是否足够
-            BigInteger bigInteger1 = new BigInteger(user.getBalance());
-            BigInteger bigInteger2 = new BigInteger(amount);
-            if (isAdd || bigInteger1.compareTo(bigInteger2) >= 0) {
-                if (isAdd) {
-                    user.setBalance(bigInteger1.add(bigInteger2).toString());
+            // 只有一个线程能获取到锁
+            if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
+                SysUser user = sysUserMapper.selectById(userId);
+                // 判断余额是否足够
+                BigInteger bigInteger1 = new BigInteger(user.getBalance());
+                BigInteger bigInteger2 = new BigInteger(amount);
+                if (isAdd || bigInteger1.compareTo(bigInteger2) >= 0) {
+                    if (isAdd) {
+                        user.setBalance(bigInteger1.add(bigInteger2).toString());
+                    } else {
+                        user.setBalance(bigInteger1.subtract(bigInteger2).toString());
+                    }
+
+                    //因为不是Web环境，所以mybatisplus的自动填充会失效，这里手动填充
+                    user.setUpdateTime(LocalDateTime.now());
+                    user.setUpdateBy(user.getId());
+                    sysUserMapper.updateById(user);
+
                 } else {
-                    user.setBalance(bigInteger1.subtract(bigInteger2).toString());
+                    return false;
                 }
-                sysUserMapper.updateById(user);
-            } else {
-                return false;
             }
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
         } finally {
-            lock.unlock();
+            // 只能释放自己的锁
+            if (lock.isHeldByCurrentThread()) {
+                System.out.println("unLock: " + Thread.currentThread().getId());
+                lock.unlock();
+            }
         }
         return true;
     }

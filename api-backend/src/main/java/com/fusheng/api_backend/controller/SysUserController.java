@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fusheng.api_backend.common.BaseResponse;
 import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
+import com.fusheng.api_backend.service.SysUserService;
 import com.fusheng.common.model.dto.SysUser.SetUserRoleDTO;
 import com.fusheng.common.model.dto.SysUser.SysUserLoginDTO;
 import com.fusheng.common.model.dto.SysUser.SysUserPageQueryDTO;
@@ -17,7 +18,6 @@ import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.vo.SysUser.SysUserInfoVO;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
 import com.fusheng.common.model.vo.SysUser.SysUserPageQueryVO;
-import com.fusheng.api_backend.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -69,7 +69,7 @@ public class SysUserController {
     @PostMapping("/save")
     public BaseResponse<SysUser> save(@RequestBody SysUserSaveDTO dto) {
 
-       SysUser user= sysUserService.saveOrUpdateUser(dto);
+        SysUser user = sysUserService.saveOrUpdateUser(dto);
         return BaseResponse.success(user);
     }
 
@@ -118,6 +118,7 @@ public class SysUserController {
         sysUserService.updateById(user);
         return BaseResponse.success(sk);
     }
+
     @Operation(summary = "重置SecretKey")
     @GetMapping("/logout")
     public BaseResponse logout() {

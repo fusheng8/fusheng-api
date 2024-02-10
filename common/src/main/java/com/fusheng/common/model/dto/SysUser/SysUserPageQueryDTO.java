@@ -3,11 +3,13 @@ package com.fusheng.common.model.dto.SysUser;
 import com.fusheng.common.model.common.PageQueryDTO;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 分页查询用户
  */
 @Data
-public class SysUserPageQueryDTO extends PageQueryDTO {
+public class SysUserPageQueryDTO extends PageQueryDTO implements Serializable {
     /**
      * 用户名
      */

@@ -11,8 +11,6 @@ import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.redisson.api.RedissonClient;
 
-import java.math.BigInteger;
-
 @DubboService
 public class GatewayServiceImpl implements GatewayService {
     @Resource
@@ -57,7 +55,7 @@ public class GatewayServiceImpl implements GatewayService {
      */
     @Override
     public boolean deductUserBalance(long userId, String amount) {
-        return userService.deductUserBalance(userId,false, amount);
+        return userService.deductUserBalance(userId, false, amount);
     }
 
 

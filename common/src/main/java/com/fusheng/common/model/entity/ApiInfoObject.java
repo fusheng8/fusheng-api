@@ -3,11 +3,13 @@ package com.fusheng.common.model.entity;
 import com.fusheng.common.model.enums.RequestMethodEnum;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * api信息的对象版本（所有json字段转换成对象）
  */
 @Data
-public class ApiInfoObject {
+public class ApiInfoObject implements Serializable {
     /**
      * id
      */

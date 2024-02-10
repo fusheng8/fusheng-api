@@ -19,21 +19,44 @@ public class MybatisPlusAutoFill implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         LocalDateTime now = LocalDateTime.now();
-        long userId = StpUtil.getLoginIdAsLong();
-        this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, now);
-        this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, now);
-        this.strictInsertFill(metaObject, "createBy", Long.class, userId);
-        this.strictInsertFill(metaObject, "updateBy", Long.class, userId);
+
+        LocalDateTime hasCreateTime = (LocalDateTime) this.getFieldValByName("createTime", metaObject);
+        LocalDateTime hasUpdateTime = (LocalDateTime) this.getFieldValByName("updateTime", metaObject);
+        Long hasCreateBy = (Long) this.getFieldValByName("createBy", metaObject);
+        Long hasUpdateBy = (Long) this.getFieldValByName("updateBy", metaObject);
+        if (hasCreateTime == null) {
+            this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, now);
+        }
+        if (hasUpdateTime == null) {
+            this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, now);
+        }
+        if (hasCreateBy == null) {
+            long userId = StpUtil.getLoginIdAsLong();
+            this.strictInsertFill(metaObject, "createBy", Long.class, userId);
+        }
+        if (hasUpdateBy == null) {
+            long userId = StpUtil.getLoginIdAsLong();
+            this.strictInsertFill(metaObject, "updateBy", Long.class, userId);
+        }
 
     }
 
     //更新时的填充策略
     @Override
     public void updateFill(MetaObject metaObject) {
-        LocalDateTime now = LocalDateTime.now();
-        long userId = StpUtil.getLoginIdAsLong();
-        this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, now);
-        this.strictUpdateFill(metaObject, "updateBy", Long.class, userId);
+
+        LocalDateTime hasUpdateTime = (LocalDateTime) this.getFieldValByName("updateTime", metaObject);
+        Long hasUpdateBy = (Long) this.getFieldValByName("updateBy", metaObject);
+
+        if (hasUpdateTime == null) {
+            LocalDateTime now = LocalDateTime.now();
+            this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, now);
+        }
+
+        if (hasUpdateBy == null) {
+            long userId = StpUtil.getLoginIdAsLong();
+            this.strictUpdateFill(metaObject, "updateBy", Long.class, userId);
+        }
     }
 }
 

@@ -1,17 +1,18 @@
 package com.fusheng.common.model.entity;
 
-import java.time.LocalDateTime;
-
 import com.baomidou.mybatisplus.annotation.*;
 import com.fusheng.common.model.enums.RequestMethodEnum;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 接口信息
  */
 @Data
 @TableName(value = "api_info")
-public class ApiInfo {
+public class ApiInfo implements Serializable {
     /**
      * id
      */

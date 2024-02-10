@@ -6,10 +6,11 @@ import com.fusheng.common.model.entity.ResponseParam;
 import com.fusheng.common.model.enums.RequestMethodEnum;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class ApiInfoSavaOrUpdateDTO {
+public class ApiInfoSavaOrUpdateDTO implements Serializable {
     /**
      * id
      */

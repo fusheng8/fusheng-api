@@ -41,8 +41,9 @@ public class BaseResponse<T> implements Serializable {
     public static BaseResponse error(ErrorCode errorCode) {
         return new BaseResponse(errorCode);
     }
-    public static BaseResponse error(ErrorCode errorCode,String message) {
-        return BaseResponse.error(errorCode.getCode(),message);
+
+    public static BaseResponse error(ErrorCode errorCode, String message) {
+        return BaseResponse.error(errorCode.getCode(), message);
     }
 
     public static BaseResponse error(int code, String message) {

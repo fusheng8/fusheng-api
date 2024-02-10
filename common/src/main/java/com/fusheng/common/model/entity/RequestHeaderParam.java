@@ -2,12 +2,14 @@ package com.fusheng.common.model.entity;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class RequestHeaderParam {
+public class RequestHeaderParam implements Serializable {
     /**
      * 请求头名称
      */
-    private String name ;
+    private String name;
 
     /**
      * 请求头示例值

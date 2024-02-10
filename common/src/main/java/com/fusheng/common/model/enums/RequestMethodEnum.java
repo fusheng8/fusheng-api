@@ -1,7 +1,6 @@
 package com.fusheng.common.model.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Data;
 import lombok.Getter;
 
 /**
@@ -13,7 +12,8 @@ public enum RequestMethodEnum {
     POST(1);
     @EnumValue
     private final int type;
+
     RequestMethodEnum(int type) {
-        this.type= type;
+        this.type = type;
     }
 }

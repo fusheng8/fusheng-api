@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fusheng.api_backend.common.BaseResponse;
 import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
+import com.fusheng.api_backend.service.ApiInfoService;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoPageQueryDTO;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
 import com.fusheng.common.model.entity.ApiInfo;
 import com.fusheng.common.model.vo.ApiInfo.ApiInfoPageQueryVO;
-import com.fusheng.api_backend.service.ApiInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -62,7 +62,7 @@ public class ApiInfoController {
     @Operation(summary = "根据id查询")
     @GetMapping("/queryById")
     public BaseResponse<ApiInfo> queryById(Long id) {
-        if (id == null)throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        if (id == null) throw new BusinessException(ErrorCode.PARAMS_ERROR);
         return BaseResponse.success(apiInfoService.getById(id));
     }
 }

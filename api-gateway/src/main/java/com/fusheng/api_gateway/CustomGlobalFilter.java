@@ -35,14 +35,25 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 public class CustomGlobalFilter implements GlobalFilter, Ordered {
-    @DubboReference
-    private GatewayService gatewayService;
-    @Resource
-    private RedissonClient redissonClient;
     /**
      * 过期时间
      */
     public static final Long EXPIRE_TIME = 10 * 60 * 1000L;
+    @DubboReference
+    private GatewayService gatewayService;
+    @Resource
+    private RedissonClient redissonClient;
+
+    /**
+     * 认证失败
+     *
+     * @param response
+     * @return
+     */
+    private static Mono<Void> authenticateFailed(ServerHttpResponse response) {
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        return response.setComplete();
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -57,19 +68,18 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         }
 
         HttpHeaders headers = request.getHeaders();
-        String authorization = headers.getFirst("Authorization");
         String accessKey = headers.getFirst("AccessKey");
         String timestamp = headers.getFirst("Timestamp");
         String sign = headers.getFirst("Sign");
         String nonce = headers.getFirst("nonce");
 
-        if (StringUtils.isAnyBlank(authorization, accessKey, timestamp, sign, nonce)) {
+        if (StringUtils.isAnyBlank(accessKey, timestamp, sign, nonce)) {
             return authenticateFailed(response);
         }
 
         // 判断是否有权限
         SysUser user = gatewayService.getUserByAccessKey(accessKey);
-        if (user == null && !authenticate(authorization, accessKey, timestamp, sign, nonce)) {
+        if (user != null && !authenticate(accessKey, user.getSecretKey(), timestamp, nonce, sign)) {
             return authenticateFailed(response);
         }
 
@@ -87,12 +97,11 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         HttpStatusCode statusCode = response.getStatusCode();
 
 
-        if (statusCode == HttpStatus.OK) {
-            ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(response) {
+        ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(response) {
 
-                @Override
-                public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
-                    // ToDo 记录日志
+            @Override
+            public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
+                // ToDo 记录日志
 //                    if (body instanceof Flux) {
 //                        Flux<? extends DataBuffer> fluxBody = Flux.from(body);
 //                        //
@@ -116,25 +125,24 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 //                        log.error("<--- {} 响应code异常", getStatusCode());
 //                    }
 
-                    //如果响应码是200，那么就扣积分
-                    if (statusCode == HttpStatus.OK) {
-                        if (!gatewayService.deductUserBalance(user.getId(), apiInfo.getReduceBalance())){
-                            //扣除积分失败
-                            return authenticateFailed(response);
-                        }
+                //如果响应码是200，那么就扣积分
+                if (statusCode == HttpStatus.OK) {
+                    if (!"0".equals(apiInfo.getReduceBalance()) && !gatewayService.deductUserBalance(user.getId(), apiInfo.getReduceBalance())) {
+                        //扣除积分失败
+                        return authenticateFailed(response);
                     }
-                    return super.writeWith(body);
                 }
-            };
-            return chain.filter(exchange.mutate().response(decoratedResponse).build());
-        }
-        return chain.filter(exchange);
+                return super.writeWith(body);
+            }
+        };
+        return chain.filter(exchange.mutate().response(decoratedResponse).build());
+
     }
 
     /**
      * 验证是否有权限
      */
-    private boolean authenticate(String authorization, String accessKey, String timestamp, String sign, String nonce) {
+    private boolean authenticate(String accessKey, String secretKey, String timestamp, String nonce, String sign) {
 
 
         // 验证时间戳 10s内有效
@@ -150,22 +158,10 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
             // 保存nonce
             bucket.set(nonce, EXPIRE_TIME, TimeUnit.MILLISECONDS);
         }
-        if (getSign(accessKey, timestamp, nonce).equals(sign)) {
+        if (!getSign(accessKey, secretKey, timestamp, nonce).equals(sign)) {
             return false;
         }
         return true;
-    }
-
-
-    /**
-     * 认证失败
-     *
-     * @param response
-     * @return
-     */
-    private static Mono<Void> authenticateFailed(ServerHttpResponse response) {
-        response.setStatusCode(HttpStatus.UNAUTHORIZED);
-        return response.setComplete();
     }
 
     @Override
@@ -177,8 +173,9 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
     /**
      * 计算签名
      */
-    private String getSign(String accessKey, String timestamp, String nonce) {
+    private String getSign(String accessKey, String secretKey, String timestamp, String nonce) {
         Digester sha1 = new Digester(DigestAlgorithm.SHA1);
-        return sha1.digestHex(accessKey + timestamp + nonce);
+        String s = sha1.digestHex(timestamp + accessKey + secretKey + nonce);
+        return sha1.digestHex(timestamp + accessKey + secretKey + nonce);
     }
 }

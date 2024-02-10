@@ -2,8 +2,10 @@ package com.fusheng.common.model.entity;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class ResponseParam {
+public class ResponseParam implements Serializable {
     /**
      * 响应参数名称
      */

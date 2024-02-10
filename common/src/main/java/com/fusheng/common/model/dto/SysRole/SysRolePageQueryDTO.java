@@ -3,11 +3,13 @@ package com.fusheng.common.model.dto.SysRole;
 import com.fusheng.common.model.common.PageQueryDTO;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 分页查询角色
  */
 @Data
-public class SysRolePageQueryDTO extends PageQueryDTO {
+public class SysRolePageQueryDTO extends PageQueryDTO implements Serializable {
     /**
      * 角色名称
      */

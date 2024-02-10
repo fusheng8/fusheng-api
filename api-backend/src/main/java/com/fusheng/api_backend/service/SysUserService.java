@@ -10,7 +10,6 @@ import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.vo.SysUser.SysUserInfoVO;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
 
-import java.math.BigInteger;
 import java.util.List;
 
 public interface SysUserService extends IService<SysUser> {

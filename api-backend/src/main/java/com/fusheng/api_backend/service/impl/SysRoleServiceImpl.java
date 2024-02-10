@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fusheng.api_backend.mapper.SysRoleMapper;
+import com.fusheng.api_backend.service.SysRoleService;
 import com.fusheng.common.model.dto.SysRole.SysRolePageQueryDTO;
 import com.fusheng.common.model.entity.SysRole;
-import com.fusheng.api_backend.service.SysRoleService;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -14,8 +14,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements SysRoleService {
-   @Resource
+    @Resource
     private SysRoleMapper sysRoleMapper;
+
     @Override
     public Page<SysRole> pageQuery(SysRolePageQueryDTO dto) {
         Page<SysRole> queryPage = new Page<>(dto.getCurrent(), dto.getPageSize());
@@ -24,7 +25,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             queryWrapper.like("name", dto.getName());
         }
 
-        if (dto.getOrder()!=null&&StringUtils.isNotBlank(dto.getColumn())) {
+        if (dto.getOrder() != null && StringUtils.isNotBlank(dto.getColumn())) {
             switch (dto.getOrder()) {
                 case asc:
                     queryWrapper.orderByAsc(dto.getColumn());

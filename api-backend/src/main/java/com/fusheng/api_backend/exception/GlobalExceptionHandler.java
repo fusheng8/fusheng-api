@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
     public BaseResponse<?> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
 
-        return BaseResponse.error(ErrorCode.PARAMS_ERROR,fieldErrors.get(0).getDefaultMessage());
+        return BaseResponse.error(ErrorCode.PARAMS_ERROR, fieldErrors.get(0).getDefaultMessage());
     }
 
     /**

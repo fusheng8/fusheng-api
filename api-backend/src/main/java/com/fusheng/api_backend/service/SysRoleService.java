@@ -8,6 +8,7 @@ import com.fusheng.common.model.entity.SysRole;
 public interface SysRoleService extends IService<SysRole> {
     /**
      * 分页查询角色
+     *
      * @param dto
      * @return
      */

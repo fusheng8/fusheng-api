@@ -1,9 +1,9 @@
 package com.fusheng.api_backend.config;
 
 import cn.dev33.satoken.stp.StpInterface;
-import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.api_backend.service.SysRoleService;
 import com.fusheng.api_backend.service.SysUserService;
+import com.fusheng.common.model.entity.SysUser;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +18,7 @@ public class StpInterfaceImpl implements StpInterface {
     private SysUserService sysUserService;
     @Resource
     private SysRoleService sysRoleService;
+
     /**
      * 返回一个账号所拥有的权限码集合
      */

@@ -14,57 +14,57 @@ import java.time.LocalDateTime;
 public class SysRole implements Serializable {
     @TableId(type = IdType.AUTO)
     /**
-    * 角色ID
-    */
+     * 角色ID
+     */
     private Long id;
 
     /**
-    * 角色名称
-    */
+     * 角色名称
+     */
     private String name;
 
     /**
-    * 角色权限字符串
-    */
+     * 角色权限字符串
+     */
     private String roleKey;
 
     /**
-    * 角色状态（1正常 0停用）
-    */
+     * 角色状态（1正常 0停用）
+     */
     private Byte status;
 
     /**
-    * 备注
-    */
+     * 备注
+     */
     private String remark;
 
     /**
-    * 删除标志（0代表存在 2代表删除）
-    */
+     * 删除标志（0代表存在 2代表删除）
+     */
     @TableLogic
     private Integer isDeleted;
 
     /**
-    * 创建者
-    */
+     * 创建者
+     */
     @TableField(fill = FieldFill.INSERT)
     private Long createBy;
 
     /**
-    * 创建时间
-    */
+     * 创建时间
+     */
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**
-    * 更新者
-    */
+     * 更新者
+     */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateBy;
 
     /**
-    * 更新时间
-    */
+     * 更新时间
+     */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 }

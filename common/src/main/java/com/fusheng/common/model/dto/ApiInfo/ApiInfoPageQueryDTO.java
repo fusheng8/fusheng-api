@@ -4,11 +4,13 @@ import com.fusheng.common.model.common.PageQueryDTO;
 import com.fusheng.common.model.enums.RequestMethodEnum;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 分页查询角色
  */
 @Data
-public class ApiInfoPageQueryDTO extends PageQueryDTO {
+public class ApiInfoPageQueryDTO extends PageQueryDTO implements Serializable {
     /**
      * 接口名称
      */

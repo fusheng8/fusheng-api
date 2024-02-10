@@ -22,7 +22,6 @@ public interface GatewayService {
     ApiInfo getApiInfoByApiUrl(String apiUrl);
 
     /**
-     *
      * @param userId
      * @param amount
      * @return boolean 是否扣除成功

@@ -14,6 +14,6 @@ public class PasswordUtil {
      * @return
      */
     public static String encrypt(String password) {
-        return SecureUtil.md5(encryptKey+ password);
+        return SecureUtil.md5(encryptKey + password);
     }
 }

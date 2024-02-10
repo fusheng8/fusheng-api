@@ -3,10 +3,11 @@ package com.fusheng.common.model.vo.SysUser;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class SysUserInfoVO {
+public class SysUserInfoVO implements Serializable {
     /**
      * 主键
      */

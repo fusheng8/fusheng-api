@@ -2,8 +2,10 @@ package com.fusheng.common.model.entity;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class RequestParam {
+public class RequestParam implements Serializable {
     /**
      * 请求参数名称
      */
