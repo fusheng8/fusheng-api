@@ -11,6 +11,8 @@
 
     <artifactId>common</artifactId>
 
+    <packaging>jar</packaging>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -30,4 +32,5 @@
             <version>3.5.3.2</version>
         </dependency>
     </dependencies>
+
 </project>

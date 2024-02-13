@@ -10,15 +10,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FushengApiClient {
     // 请求地址
-    private static final String url = "http://localhost:7000/api/wl/yan/yiyan";
+    private static final String url = "http://43.136.38.19:5756/api/wl/yan/yiyan";
     private String accessKey;
     private String secretKey;
-
-    public static void main(String[] args) {
-        FushengApiClient fushengApiClient = new FushengApiClient("8f7bdswr92zbkcun4fbe64xf", "uuj65jjkdan5ss9gtvs3ic2jrgzxb30n");
-        String send = fushengApiClient.send();
-        System.out.println(send);
-    }
 
     public String send() {
         // 1. 获取时间戳

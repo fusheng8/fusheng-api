@@ -1,12 +1,10 @@
 server:
-  port: 7000
+  port: 5756
 #
 
 spring:
   application:
     name: api-gateway
-  profiles:
-    active: prod
   data:
     redis:
       host: 127.0.0.1

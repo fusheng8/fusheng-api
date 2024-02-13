@@ -12,6 +12,8 @@
     <groupId>com.fusheng.api-backend</groupId>
     <artifactId>api-backend</artifactId>
 
+    <packaging>jar</packaging>
+
     <dependencies>
 
         <dependency>
@@ -74,5 +76,15 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
 
 </project>
