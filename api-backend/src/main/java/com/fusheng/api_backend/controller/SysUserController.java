@@ -11,10 +11,7 @@ import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.service.SysRoleService;
 import com.fusheng.api_backend.service.SysUserService;
-import com.fusheng.common.model.dto.SysUser.SetUserRoleDTO;
-import com.fusheng.common.model.dto.SysUser.SysUserLoginDTO;
-import com.fusheng.common.model.dto.SysUser.SysUserPageQueryDTO;
-import com.fusheng.common.model.dto.SysUser.SysUserSaveDTO;
+import com.fusheng.common.model.dto.SysUser.*;
 import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.vo.SysUser.SysUserInfoVO;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
@@ -44,6 +41,13 @@ public class SysUserController {
     public BaseResponse<SysUserLoginVO> login(@Validated @RequestBody SysUserLoginDTO sysUserLoginDTO) {
         SysUserLoginVO sysUserLoginVO = sysUserService.login(sysUserLoginDTO);
         return BaseResponse.success(sysUserLoginVO);
+    }
+    @SaIgnore
+    @Operation(summary = "注册")
+    @PostMapping("/register")
+    public BaseResponse register(@Validated @RequestBody SysUserRegisterDTO sysUserRegisterDTO) {
+        sysUserService.register(sysUserRegisterDTO);
+        return BaseResponse.success();
     }
 
     @Operation(summary = "获取用户信息")
@@ -80,7 +84,7 @@ public class SysUserController {
                 (dto.getId() != null && dto.getId() != StpUtil.getLoginIdAsLong())) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
-        SysUser user = sysUserService.saveOrUpdate(dto);
+        SysUser user = sysUserService.saveOrUpdate(dto,false);
 
         return BaseResponse.success(user);
     }

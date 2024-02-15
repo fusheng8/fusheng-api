@@ -10,10 +10,7 @@ import com.fusheng.api_backend.mapper.SysUserMapper;
 import com.fusheng.api_backend.service.SysUserService;
 import com.fusheng.api_backend.utils.PasswordUtil;
 import com.fusheng.common.constant.RedisName;
-import com.fusheng.common.model.dto.SysUser.SetUserRoleDTO;
-import com.fusheng.common.model.dto.SysUser.SysUserLoginDTO;
-import com.fusheng.common.model.dto.SysUser.SysUserPageQueryDTO;
-import com.fusheng.common.model.dto.SysUser.SysUserSaveDTO;
+import com.fusheng.common.model.dto.SysUser.*;
 import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
 import com.google.gson.Gson;
@@ -58,6 +55,29 @@ public class SysUserServiceImpl implements SysUserService {
         SysUserLoginVO sysUserLoginVO = new SysUserLoginVO();
         sysUserLoginVO.setToken(StpUtil.getTokenInfo().getTokenValue());
         return sysUserLoginVO;
+    }
+
+    @Override
+    public void register(SysUserRegisterDTO dto) {
+        //验证验证码
+        RBucket<String> bucket = redissonClient.getBucket(RedisName.CODE_REGISTER + dto.getEmail());
+        if (!dto.getCode().equals(bucket.get())) {
+            throw new BusinessException(ErrorCode.CODE_ERROR);
+        }
+
+        //验证用户名是否重复
+        QueryWrapper<SysUser> sysUserQueryWrapper = new QueryWrapper<>();
+        sysUserQueryWrapper.eq("username", dto.getUsername());
+        if (sysUserMapper.selectOne(sysUserQueryWrapper) != null) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "用户名已存在");
+        }
+
+        SysUserSaveDTO sysUserSaveDTO = new SysUserSaveDTO();
+        BeanUtils.copyProperties(dto, sysUserSaveDTO);
+        //设置默认信息
+        sysUserSaveDTO.setUserStatus((byte) 1);
+        sysUserSaveDTO.setRoles(List.of(2L));
+        this.saveOrUpdate(sysUserSaveDTO,true);
     }
 
     @Override
@@ -118,7 +138,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public SysUser saveOrUpdate(SysUserSaveDTO dto) {
+    public SysUser saveOrUpdate(SysUserSaveDTO dto,boolean isRegister) {
         SysUser user = new SysUser();
         BeanUtils.copyProperties(dto, user);
         if (StringUtils.isNoneEmpty(user.getPassword())) {
@@ -131,6 +151,11 @@ public class SysUserServiceImpl implements SysUserService {
         }
         if (dto.getId() != null) {
             //更新操作
+            if (isRegister){
+                //如果是注册模式则手动赋值修改者、修改时间
+                user.setUpdateBy(0L);
+                user.setUpdateTime(LocalDateTime.now());
+            }
             sysUserMapper.updateById(user);
             //修改用户缓存
             redissonClient.getBucket(RedisName.USER_BY_ID + dto.getId()).set(user);
@@ -138,6 +163,13 @@ public class SysUserServiceImpl implements SysUserService {
             //新增操作
             user.setAccessKey(RandomUtil.randomString(16));
             user.setSecretKey(RandomUtil.randomString(32));
+            if (isRegister){
+                //如果是注册模式则手动赋值创建者、创建时间、修改者、修改时间
+                user.setCreateBy(0L);
+                user.setCreateTime(LocalDateTime.now());
+                user.setUpdateBy(0L);
+                user.setUpdateTime(LocalDateTime.now());
+            }
             sysUserMapper.insert(user);
         }
 
@@ -190,7 +222,7 @@ public class SysUserServiceImpl implements SysUserService {
         if (i > 0) {
             //删除用户缓存
             ids.forEach(id -> {
-                if (id == 1L||id==2L) {
+                if (id == 1L || id == 2L) {
                     throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "系统账号不可删除");
                 }
                 redissonClient.getBucket(RedisName.USER_BY_ID + id).delete();
