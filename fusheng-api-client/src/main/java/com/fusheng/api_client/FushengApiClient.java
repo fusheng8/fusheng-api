@@ -14,6 +14,13 @@ public class FushengApiClient {
     private String accessKey;
     private String secretKey;
 
+    public static void main(String[] args) {
+        FushengApiClient fushengApiClient = new FushengApiClient("8f7bdswr92zbkcun4fbe64xf", "zkrd7kxtepzfrg26jh0b1bsncvkej85i");
+        String result = fushengApiClient.send();
+        System.out.println(result);
+
+    }
+
     public String send() {
         // 1. 获取时间戳
         String timestamp = String.valueOf(System.currentTimeMillis());
@@ -22,11 +29,6 @@ public class FushengApiClient {
         // 3. 计算签名
         String sign = getSign(accessKey, secretKey, timestamp, nonce);
         // 4. 设置请求
-        System.out.println("accessKey = " + accessKey);
-        System.out.println("secretKey = " + secretKey);
-        System.out.println("timestamp = " + timestamp);
-        System.out.println("nonce = " + nonce);
-        System.out.println("sign = " + sign);
         try (HttpResponse response = HttpRequest.get(url)
                 .header("AccessKey", accessKey)
                 .header("Timestamp", timestamp)

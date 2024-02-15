@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: dev
   application:
     name: init
   datasource:
@@ -15,7 +13,7 @@ spring:
       database: 3
 
 server:
-  port: 8080
+  port: 5758
 
 mybatis-plus:
   configuration:

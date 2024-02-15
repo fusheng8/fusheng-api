@@ -1,18 +1,16 @@
 package com.fusheng.api_backend.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.fusheng.common.model.dto.SysUser.SetUserRoleDTO;
 import com.fusheng.common.model.dto.SysUser.SysUserLoginDTO;
 import com.fusheng.common.model.dto.SysUser.SysUserPageQueryDTO;
 import com.fusheng.common.model.dto.SysUser.SysUserSaveDTO;
 import com.fusheng.common.model.entity.SysUser;
-import com.fusheng.common.model.vo.SysUser.SysUserInfoVO;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
 
 import java.util.List;
 
-public interface SysUserService extends IService<SysUser> {
+public interface SysUserService {
     /**
      * 登录用户
      *
@@ -28,14 +26,13 @@ public interface SysUserService extends IService<SysUser> {
      */
     Page<SysUser> pageQuery(SysUserPageQueryDTO dto);
 
-
     /**
-     * 根据用户id列表查询角色名称列表
+     * 根据id获取用户
      *
-     * @param dto
+     * @param id
      * @return
      */
-    List<String> getRoleKeysByIds(String dto);
+    SysUser getById(long id);
 
     /**
      * 设置用户角色
@@ -44,21 +41,13 @@ public interface SysUserService extends IService<SysUser> {
      */
     void setUserRole(SetUserRoleDTO dto);
 
-    /***
-     * 根据id获取用户信息
-     *
-     * @param id
-     * @return
-     */
-    SysUserInfoVO getUserInfoById(long id);
-
     /**
      * 保存或更新用户
      *
      * @param dto
      * @return
      */
-    SysUser saveOrUpdateUser(SysUserSaveDTO dto);
+    SysUser saveOrUpdate(SysUserSaveDTO dto);
 
     /**
      * 扣除用户余额
@@ -69,4 +58,19 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      */
     boolean deductUserBalance(long userId, boolean isAdd, String amount);
+
+    /**
+     * 批量删除用户
+     *
+     * @param ids
+     * @return
+     */
+    boolean removeByIds(List<Long> ids);
+
+    /**
+     * 根据id更新用户
+     *
+     * @param user
+     */
+    void updateById(SysUser user);
 }

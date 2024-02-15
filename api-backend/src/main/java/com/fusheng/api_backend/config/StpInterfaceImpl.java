@@ -34,7 +34,7 @@ public class StpInterfaceImpl implements StpInterface {
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
         SysUser user = sysUserService.getById(Long.parseLong(loginId.toString()));
-        return sysUserService.getRoleKeysByIds(user.getRoles());
+        return sysRoleService.getRoleKeysByIds(user.getRoles());
     }
 
 }

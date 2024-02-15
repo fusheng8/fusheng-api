@@ -50,7 +50,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
      * @param response
      * @return
      */
-    private static Mono<Void> authenticateFailed(ServerHttpResponse response,String errMsg) {
+    private static Mono<Void> authenticateFailed(ServerHttpResponse response, String errMsg) {
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
         response.bufferFactory().wrap(errMsg.getBytes());
         log.error(errMsg);
@@ -66,7 +66,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         // 判断是否存在该接口
         ApiInfo apiInfo = gatewayService.getApiInfoByApiUrl(uri.split("\\?")[0]);
         if (apiInfo == null) {
-            return authenticateFailed(response,"无效的接口");
+            return authenticateFailed(response, "无效的接口");
         }
 
         HttpHeaders headers = request.getHeaders();
@@ -76,13 +76,13 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         String nonce = headers.getFirst("nonce");
 
         if (StringUtils.isAnyBlank(accessKey, timestamp, sign, nonce)) {
-            return authenticateFailed(response,"参数不完整");
+            return authenticateFailed(response, "参数不完整");
         }
 
         // 判断是否有权限
         SysUser user = gatewayService.getUserByAccessKey(accessKey);
         if (user != null && !authenticate(accessKey, user.getSecretKey(), timestamp, nonce, sign)) {
-            return authenticateFailed(response,"认证失败");
+            return authenticateFailed(response, "认证失败");
         }
 
         BigInteger bigInteger1 = new BigInteger(user.getBalance());
@@ -91,7 +91,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         //判断是否积分足够（初次检测，先过滤一部分）
         if (!"0".equals(apiInfo.getReduceBalance()) &&
                 bigInteger1.compareTo(bigInteger2) < 0) {
-            return authenticateFailed(response,"积分不足");
+            return authenticateFailed(response, "积分不足");
         }
 
 
@@ -131,7 +131,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                 if (statusCode == HttpStatus.OK) {
                     if (!"0".equals(apiInfo.getReduceBalance()) && !gatewayService.deductUserBalance(user.getId(), apiInfo.getReduceBalance())) {
                         //扣除积分失败
-                        return authenticateFailed(response,"扣除积分失败");
+                        return authenticateFailed(response, "扣除积分失败");
                     }
                 }
                 return super.writeWith(body);

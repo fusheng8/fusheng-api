@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fusheng.api_backend.common.BaseResponse;
 import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
+import com.fusheng.api_backend.service.SysRoleService;
 import com.fusheng.api_backend.service.SysUserService;
 import com.fusheng.common.model.dto.SysUser.SetUserRoleDTO;
 import com.fusheng.common.model.dto.SysUser.SysUserLoginDTO;
@@ -21,6 +22,7 @@ import com.fusheng.common.model.vo.SysUser.SysUserPageQueryVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,8 @@ import java.util.List;
 public class SysUserController {
     @Resource
     private SysUserService sysUserService;
+    @Resource
+    private SysRoleService sysRoleService;
 
     @SaIgnore
     @Operation(summary = "登录")
@@ -46,9 +50,12 @@ public class SysUserController {
     @GetMapping("/info")
     public BaseResponse<SysUserInfoVO> info() {
         long id = StpUtil.getLoginIdAsLong();
-        SysUserInfoVO user = sysUserService.getUserInfoById(id);
-
-        return BaseResponse.success(user);
+        SysUser user = sysUserService.getById(id);
+        SysUserInfoVO sysUserInfoVO = new SysUserInfoVO();
+        // 将角色信息转换为key
+        BeanUtils.copyProperties(user, sysUserInfoVO);
+        sysUserInfoVO.setRoles(sysRoleService.getRoleKeysByIds(user.getRoles()));
+        return BaseResponse.success(sysUserInfoVO);
     }
 
     @SaCheckRole("admin")
@@ -69,7 +76,7 @@ public class SysUserController {
     @PostMapping("/save")
     public BaseResponse<SysUser> save(@RequestBody SysUserSaveDTO dto) {
 
-        SysUser user = sysUserService.saveOrUpdateUser(dto);
+        SysUser user = sysUserService.saveOrUpdate(dto);
         return BaseResponse.success(user);
     }
 
@@ -77,7 +84,7 @@ public class SysUserController {
     @Operation(summary = "批量删除用户")
     @GetMapping("/deleteByIds")
     public BaseResponse<Boolean> deleteByIds(@RequestParam List<Long> ids) {
-        boolean res = sysUserService.removeBatchByIds(ids);
+        boolean res = sysUserService.removeByIds(ids);
         return BaseResponse.success(res);
     }
 
@@ -103,7 +110,7 @@ public class SysUserController {
     public BaseResponse<List<String>> getHasRoleKeys() {
         long id = StpUtil.getLoginIdAsLong();
         SysUser user = sysUserService.getById(id);
-        List<String> roleKeys = sysUserService.getRoleKeysByIds(user.getRoles());
+        List<String> roleKeys = sysRoleService.getRoleKeysByIds(user.getRoles());
         return BaseResponse.success(roleKeys);
     }
 

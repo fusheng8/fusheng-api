@@ -16,4 +16,8 @@ public class RedisName {
      * 修改用户余额的锁
      */
     public static final String USER_BALANCE_LOCK = COMMON_PREFIX + "user_balance_lock:";
+    /**
+     * accessKey对应的用户id
+     */
+    public static final String ACCESS_KEY_USER_ID = COMMON_PREFIX + "access_key_user_id:";
 }

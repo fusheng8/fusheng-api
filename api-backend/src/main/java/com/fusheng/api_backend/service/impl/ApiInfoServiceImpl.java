@@ -3,7 +3,6 @@ package com.fusheng.api_backend.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fusheng.api_backend.mapper.ApiInfoMapper;
 import com.fusheng.api_backend.service.ApiInfoService;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoPageQueryDTO;
@@ -15,8 +14,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> implements ApiInfoService {
+public class ApiInfoServiceImpl implements ApiInfoService {
     @Resource
     private ApiInfoMapper apiInfoMapper;
 
@@ -47,7 +48,7 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
     }
 
     @Override
-    public boolean saveOrUpdateApiInfo(ApiInfoSavaOrUpdateDTO dto) {
+    public boolean saveOrUpdate(ApiInfoSavaOrUpdateDTO dto) {
         ApiInfo apiInfo = new ApiInfo();
         BeanUtils.copyProperties(dto, apiInfo);
         apiInfo.setUserId(StpUtil.getLoginIdAsLong());
@@ -68,5 +69,20 @@ public class ApiInfoServiceImpl extends ServiceImpl<ApiInfoMapper, ApiInfo> impl
         } else {
             return apiInfoMapper.updateById(apiInfo) > 0;
         }
+    }
+
+    @Override
+    public ApiInfo getById(Long id) {
+        return apiInfoMapper.selectById(id);
+    }
+
+    @Override
+    public List<ApiInfo> getAllList() {
+        return apiInfoMapper.selectList(null);
+    }
+
+    @Override
+    public boolean removeByIds(List<Long> ids) {
+        return apiInfoMapper.deleteBatchIds(ids) > 0;
     }
 }

@@ -27,7 +27,7 @@ public class SysRoleController {
     @Operation(summary = "获取所有角色")
     @GetMapping("/getAllList")
     public BaseResponse<List<SysRole>> getAllRole() {
-        return BaseResponse.success(sysRoleService.list());
+        return BaseResponse.success(sysRoleService.getAllList());
     }
 
     @SaCheckRole("admin")
@@ -55,8 +55,8 @@ public class SysRoleController {
     @Operation(summary = "根据id批量删除角色")
     @GetMapping("/deleteByIds")
     public BaseResponse<String> delete(@RequestParam("ids") List<Long> ids) {
-        sysRoleService.removeByIds(ids);
-        return BaseResponse.success("删除成功");
+
+        return BaseResponse.success(sysRoleService.removeByIds(ids) ? "删除成功" : "删除失败");
     }
 
 }

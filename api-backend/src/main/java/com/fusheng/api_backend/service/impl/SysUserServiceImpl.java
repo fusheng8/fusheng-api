@@ -4,7 +4,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.mapper.SysRoleMapper;
@@ -17,10 +16,8 @@ import com.fusheng.common.model.dto.SysUser.SysUserLoginDTO;
 import com.fusheng.common.model.dto.SysUser.SysUserPageQueryDTO;
 import com.fusheng.common.model.dto.SysUser.SysUserSaveDTO;
 import com.fusheng.common.model.entity.SysUser;
-import com.fusheng.common.model.vo.SysUser.SysUserInfoVO;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
@@ -31,14 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
+public class SysUserServiceImpl implements SysUserService {
     @Resource
     private SysUserMapper sysUserMapper;
     @Resource
@@ -67,19 +63,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return sysUserLoginVO;
     }
 
-    public List<String> getRoleKeysByIds(String dto) {
-        //将角色id列表转换为字符串
-        List<Long> roleIds = new ArrayList<>();
-        JsonParser.parseString(dto).getAsJsonArray().forEach(jsonElement -> {
-            roleIds.add(jsonElement.getAsLong());
-        });
-
-        //根据角色id列表查询角色名称列表
-        List<String> roles = new ArrayList<>();
-        sysRoleMapper.selectBatchIds(roleIds).forEach(sysRole -> {
-            roles.add(sysRole.getRoleKey());
-        });
-        return roles;
+    @Override
+    public SysUser getById(long id) {
+        SysUser user = sysUserMapper.selectById(id);
+        user.setPassword(null);
+        return user;
     }
 
     @Override
@@ -123,21 +111,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public SysUserInfoVO getUserInfoById(long id) {
-        SysUser user = sysUserMapper.selectById(id);
-        SysUserInfoVO sysUserInfoVO = new SysUserInfoVO();
-        BeanUtils.copyProperties(user, sysUserInfoVO);
-
-        //转换角色id为角色key
-        List<String> roleKeys = getRoleKeysByIds(user.getRoles());
-        sysUserInfoVO.setRoles(roleKeys);
-        //脱敏
-        sysUserInfoVO.setPassword(null);
-        return sysUserInfoVO;
-    }
-
-    @Override
-    public SysUser saveOrUpdateUser(SysUserSaveDTO dto) {
+    public SysUser saveOrUpdate(SysUserSaveDTO dto) {
         //权限校验 非管理员只能修改自己的信息
         if (!StpUtil.hasRole("admin") &&
                 (dto.getId() != null && dto.getId() != StpUtil.getLoginIdAsLong())) {
@@ -206,5 +180,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean removeByIds(List<Long> ids) {
+        return sysUserMapper.deleteBatchIds(ids) > 0;
+    }
+
+    @Override
+    public void updateById(SysUser user) {
+        sysUserMapper.updateById(user);
     }
 }

@@ -28,7 +28,7 @@ public class ApiInfoController {
     @Operation(summary = "获取所有接口信息")
     @GetMapping("/getAllApiInfo")
     public BaseResponse<List<ApiInfo>> getAllApiInfo() {
-        return BaseResponse.success(apiInfoService.list());
+        return BaseResponse.success(apiInfoService.getAllList());
     }
 
     @Operation(summary = "查询用户列表")
@@ -47,7 +47,7 @@ public class ApiInfoController {
     @Operation(summary = "批量删除接口信息")
     @GetMapping("/deleteByIds")
     public BaseResponse<Boolean> deleteByIds(@RequestParam List<Long> ids) {
-        boolean res = apiInfoService.removeBatchByIds(ids);
+        boolean res = apiInfoService.removeByIds(ids);
         return BaseResponse.success(res);
     }
 
@@ -55,7 +55,7 @@ public class ApiInfoController {
     @Operation(summary = "保存或者更新接口信息")
     @PostMapping("/saveOrUpdate")
     public BaseResponse<Boolean> saveOrUpdate(@RequestBody ApiInfoSavaOrUpdateDTO dto) {
-        boolean res = apiInfoService.saveOrUpdateApiInfo(dto);
+        boolean res = apiInfoService.saveOrUpdate(dto);
         return BaseResponse.success(res);
     }
 
