@@ -3,14 +3,19 @@ package com.fusheng.api_backend.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fusheng.api_backend.common.ErrorCode;
+import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.mapper.ApiInfoMapper;
 import com.fusheng.api_backend.service.ApiInfoService;
+import com.fusheng.common.constant.RedisName;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoPageQueryDTO;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
 import com.fusheng.common.model.entity.ApiInfo;
 import com.google.gson.Gson;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +25,12 @@ import java.util.List;
 public class ApiInfoServiceImpl implements ApiInfoService {
     @Resource
     private ApiInfoMapper apiInfoMapper;
+    @Resource
+    private RedissonClient redissonClient;
 
     @Override
     public Page<ApiInfo> pageQuery(ApiInfoPageQueryDTO dto) {
+
         Page<ApiInfo> queryPage = new Page<>(dto.getCurrent(), dto.getPageSize());
         QueryWrapper<ApiInfo> queryWrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(dto.getName())) {
@@ -67,13 +75,23 @@ public class ApiInfoServiceImpl implements ApiInfoService {
         if (dto.getId() == null) {
             return apiInfoMapper.insert(apiInfo) > 0;
         } else {
-            return apiInfoMapper.updateById(apiInfo) > 0;
+            int i = apiInfoMapper.updateById(apiInfo);
+            if (i > 0) {
+                redissonClient.getBucket(RedisName.API_INFO_BY_ID + dto.getId()).set(apiInfo);
+                return true;
+            }
+            return false;
         }
     }
 
     @Override
     public ApiInfo getById(Long id) {
-        return apiInfoMapper.selectById(id);
+        ApiInfo apiInfo = apiInfoMapper.selectById(id);
+        if (apiInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        redissonClient.getBucket(RedisName.API_INFO_BY_ID + id).set(apiInfo);
+        return apiInfo;
     }
 
     @Override
@@ -83,6 +101,26 @@ public class ApiInfoServiceImpl implements ApiInfoService {
 
     @Override
     public boolean removeByIds(List<Long> ids) {
-        return apiInfoMapper.deleteBatchIds(ids) > 0;
+        int i = apiInfoMapper.deleteBatchIds(ids);
+        if (i > 0) {
+            ids.forEach(id -> {
+                redissonClient.getBucket(RedisName.API_INFO_BY_ID + id).delete();
+            });
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public ApiInfo getByUrl(String apiUrl) {
+        RBucket<Long> bucket = redissonClient.getBucket(RedisName.API_INFO_ID_BY_URL + apiUrl);
+        if (bucket.isExists()) {
+            return this.getById(bucket.get());
+        }
+        QueryWrapper<ApiInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("url", apiUrl);
+        ApiInfo apiInfo = apiInfoMapper.selectOne(queryWrapper);
+        bucket.set(apiInfo.getId());
+        return apiInfo;
     }
 }

@@ -73,4 +73,12 @@ public interface SysUserService {
      * @param user
      */
     void updateById(SysUser user);
+
+    /**
+     * 根据accessKey获取用户
+     *
+     * @param accessKey
+     * @return
+     */
+    SysUser getByAccessKey(String accessKey);
 }

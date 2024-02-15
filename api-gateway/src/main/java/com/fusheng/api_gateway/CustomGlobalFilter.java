@@ -153,7 +153,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         }
 
         // 验证nonce
-        RBucket<String> bucket = redissonClient.getBucket(RedisName.NONCE + accessKey + ":" + nonce);
+        RBucket<String> bucket = redissonClient.getBucket(RedisName.API_INFO_NONCE + accessKey + ":" + nonce);
         if (bucket.isExists()) {
             return false;
         } else {

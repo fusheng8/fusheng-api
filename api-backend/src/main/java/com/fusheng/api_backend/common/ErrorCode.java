@@ -7,7 +7,7 @@ public enum ErrorCode {
 
     SUCCESS(200, "ok"),
     PARAMS_ERROR(40000, "请求参数错误"),
-    PASSWORD_ERROR(40001, "密码错误"),
+    ACCOUNT_OR_PASSWORD_ERROR(40001, "账号或密码错误"),
     NOT_LOGIN_ERROR(40100, "未登录"),
     NO_AUTH_ERROR(40101, "无权限"),
     NOT_FOUND_ERROR(40400, "请求数据不存在"),

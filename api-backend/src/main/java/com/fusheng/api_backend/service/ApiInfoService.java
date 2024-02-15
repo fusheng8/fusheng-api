@@ -43,4 +43,12 @@ public interface ApiInfoService {
      * @return
      */
     boolean removeByIds(List<Long> ids);
+
+    /**
+     * 根据url获取接口信息
+     *
+     * @param apiUrl
+     * @return
+     */
+    ApiInfo getByUrl(String apiUrl);
 }
