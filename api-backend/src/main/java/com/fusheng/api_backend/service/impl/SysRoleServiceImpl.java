@@ -2,13 +2,17 @@ package com.fusheng.api_backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fusheng.api_backend.common.ErrorCode;
+import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.mapper.SysRoleMapper;
 import com.fusheng.api_backend.service.SysRoleService;
+import com.fusheng.common.constant.RedisName;
 import com.fusheng.common.model.dto.SysRole.SysRolePageQueryDTO;
 import com.fusheng.common.model.entity.SysRole;
 import com.google.gson.JsonParser;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,6 +23,8 @@ import java.util.List;
 public class SysRoleServiceImpl implements SysRoleService {
     @Resource
     private SysRoleMapper sysRoleMapper;
+    @Resource
+    private RedissonClient redissonClient;
 
     @Override
     public Page<SysRole> pageQuery(SysRolePageQueryDTO dto) {
@@ -55,17 +61,30 @@ public class SysRoleServiceImpl implements SysRoleService {
             sysRoleMapper.insert(sysRole);
         } else {
             sysRoleMapper.updateById(sysRole);
+            redissonClient.getBucket(RedisName.ROLE_BY_ID + sysRole.getId()).set(sysRole);
         }
     }
 
     @Override
     public boolean removeByIds(List<Long> ids) {
-        return sysRoleMapper.deleteBatchIds(ids) > 0;
+        int i = sysRoleMapper.deleteBatchIds(ids);
+        if (i > 0) {
+            ids.forEach(id -> {
+                redissonClient.getBucket(RedisName.ROLE_BY_ID + id).delete();
+            });
+            return true;
+        }
+        return false;
     }
 
     @Override
     public SysRole getById(Long id) {
-        return sysRoleMapper.selectById(id);
+        SysRole sysRole = sysRoleMapper.selectById(id);
+        if (sysRole == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        redissonClient.getBucket(RedisName.ROLE_BY_ID + id).set(sysRole);
+        return sysRole;
     }
 
     @Override

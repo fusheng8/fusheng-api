@@ -75,8 +75,13 @@ public class SysUserController {
     @Operation(summary = "保存用户")
     @PostMapping("/save")
     public BaseResponse<SysUser> save(@RequestBody SysUserSaveDTO dto) {
-
+        //权限校验 非管理员只能修改自己的信息
+        if (!StpUtil.hasRole("admin") &&
+                (dto.getId() != null && dto.getId() != StpUtil.getLoginIdAsLong())) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
         SysUser user = sysUserService.saveOrUpdate(dto);
+
         return BaseResponse.success(user);
     }
 
