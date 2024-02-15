@@ -1,21 +1,26 @@
+server:
+  port: 8080
+
 spring:
   profiles:
     active: dev
   application:
-    name: init
-  datasource:
-    url: jdbc:mysql://localhost:3306/fusheng_api?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8
-    username: root
-    password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      database: 3
+    name: fu_api
+  mail:
+    # 邮件配置信息
+    # 163邮箱的SMTP服务器配置
+    protocol: smtp  # 使用的邮件协议
+    default-encoding: UTF-8  # 默认编码格式
+    test-connection: true # 启动时是否测试连接
+    properties:
+      # 邮件客户端属性配置
+      mail.smtp.auth: true  # 启用SMTP身份验证
+      mail.smtp.starttls.enable: true  # 启用STARTTLS协议
+      mail.smtp.starttls.required: true  # 要求使用STARTTLS协议
+      mail.smtp.socketFactory.port: 465  # SSL连接使用的端口号
+      mail.smtp.socketFactory.class: javax.net.ssl.SSLSocketFactory  # SSL连接的SocketFactory类
+      mail.smtp.socketFactory.fallback: false  # SSL连接失败时不回退到非加密连接
 
-server:
-  port: 8080
 
 mybatis-plus:
   configuration:
@@ -26,24 +31,6 @@ mybatis-plus:
       logic-delete-field: is_delete # 逻辑删除字段
       logic-delete-value: 1 # 逻辑删除值
       logic-not-delete-value: 0 # 逻辑删除未删除值
-
-# springdoc-openapi项目配置
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-    tags-sorter: alpha
-    operations-sorter: alpha
-  api-docs:
-    path: /v3/api-docs
-  group-configs:
-    - group: 'default'
-      paths-to-match: '/**'
-      packages-to-scan: com.fusheng.api_backend.controller
-# knife4j的增强配置，不需要增强可以不配
-knife4j:
-  enable: true
-  setting:
-    language: zh_cn
 
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:
@@ -62,9 +49,6 @@ sa-token:
   # 是否输出操作日志
   is-log: true
 
-fusheng:
-  # 加密秘钥
-  encrypt-key: 186cfa4cd57b
 
 dubbo:
   application:

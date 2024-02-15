@@ -30,20 +30,11 @@ public class SysUserSaveDTO implements Serializable {
      */
     private String password;
 
-    /**
-     * 用户昵称
-     */
-    private String nickName;
 
     /**
      * 邮箱
      */
     private String email;
-
-    /**
-     * 手机号
-     */
-    private String phone;
 
     /**
      * 角色

@@ -33,7 +33,7 @@ public class AddSysUserDTO implements Serializable {
     private String password;
 
     /**
-     * 用户昵称
+     * 用户名
      */
     private String username;
 
@@ -41,11 +41,6 @@ public class AddSysUserDTO implements Serializable {
      * 邮箱
      */
     private String email;
-
-    /**
-     * 手机号
-     */
-    private String phone;
 
     /**
      * 角色

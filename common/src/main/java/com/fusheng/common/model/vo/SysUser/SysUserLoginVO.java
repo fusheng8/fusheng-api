@@ -6,5 +6,8 @@ import java.io.Serializable;
 
 @Data
 public class SysUserLoginVO implements Serializable {
+    /**
+     * token
+     */
     private String token;
 }

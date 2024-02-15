@@ -1,6 +1,4 @@
 spring:
-  application:
-    name: init
   datasource:
     url: jdbc:mysql://localhost:3306/fusheng_api?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8
     username: fusheng_api
@@ -11,36 +9,17 @@ spring:
       host: localhost
       port: 6379
       database: 3
+  mail:
+    # 邮件配置信息
+    # 163邮箱的SMTP服务器配置
+    host: smtp.126.com  # SMTP服务器地址
+    port: 465 # 端口号（默认为SMTP的标准端口）
+    from: 浮生API聚合平台
+    username: fusheng656@126.com  # 发件人邮箱地址
+    password: NHFXOAWVGGQHBLJA  # 发件人邮箱密码
 
 server:
   port: 5758
-
-mybatis-plus:
-  configuration:
-    map-underscore-to-camel-case: true # 开启驼峰命名
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  global-config:
-    db-config:
-      logic-delete-field: is_delete # 逻辑删除字段
-      logic-delete-value: 1 # 逻辑删除值
-      logic-not-delete-value: 0 # 逻辑删除未删除值
-
-############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
-sa-token:
-  # token 名称（同时也是 cookie 名称）
-  token-name: token
-  # token 有效期（单位：秒） 默认30天，-1 代表永久有效
-  timeout: 2592000
-  # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
-  active-timeout: -1
-  # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
-  is-concurrent: true
-  # 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token）
-  is-share: true
-  # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
-  token-style: uuid
-  # 是否输出操作日志
-  is-log: true
 
 fusheng:
   # 加密秘钥
@@ -55,6 +34,3 @@ dubbo:
   registry:
     id: nacos
     address: nacos://127.0.0.1:8848
-logging:
-  level:
-    root: error
