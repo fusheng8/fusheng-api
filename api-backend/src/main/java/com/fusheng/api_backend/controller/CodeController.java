@@ -1,6 +1,5 @@
 package com.fusheng.api_backend.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.fusheng.api_backend.common.BaseResponse;
 import com.fusheng.api_backend.service.CodeService;
 import io.swagger.v3.oas.annotations.Operation;

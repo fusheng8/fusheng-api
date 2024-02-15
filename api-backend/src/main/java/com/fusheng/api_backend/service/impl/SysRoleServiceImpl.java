@@ -12,6 +12,7 @@ import com.fusheng.common.model.entity.SysRole;
 import com.google.gson.JsonParser;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,6 @@ public class SysRoleServiceImpl implements SysRoleService {
         if (StringUtils.isNotBlank(dto.getName())) {
             queryWrapper.like("name", dto.getName());
         }
-
         if (dto.getOrder() != null && StringUtils.isNotBlank(dto.getColumn())) {
             switch (dto.getOrder()) {
                 case asc:
@@ -79,11 +79,15 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     public SysRole getById(Long id) {
+        RBucket<SysRole> bucket = redissonClient.getBucket(RedisName.ROLE_BY_ID + id);
+        if (bucket.isExists()) {
+            return bucket.get();
+        }
         SysRole sysRole = sysRoleMapper.selectById(id);
         if (sysRole == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        redissonClient.getBucket(RedisName.ROLE_BY_ID + id).set(sysRole);
+        bucket.set(sysRole);
         return sysRole;
     }
 

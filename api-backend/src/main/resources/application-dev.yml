@@ -17,7 +17,6 @@ spring:
     # 163邮箱的SMTP服务器配置
     host: smtp.126.com  # SMTP服务器地址
     port: 465 # 端口号（默认为SMTP的标准端口）
-    from: 浮生API聚合平台
     username: fusheng656@126.com  # 发件人邮箱地址
     password: NHFXOAWVGGQHBLJA  # 发件人邮箱密码
 

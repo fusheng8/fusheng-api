@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class CodeServiceImpl implements CodeService {
+    //注册验证码时效
+    private static final long REGISTER_CODE_EXPIRE = 5L;
     @Resource
     private RedissonClient redissonClient;
     @Resource
@@ -24,8 +26,6 @@ public class CodeServiceImpl implements CodeService {
     // 配置文件中我的qq邮箱
     @Value("${spring.mail.username}")
     private String from;
-    //注册验证码时效
-    private static final long REGISTER_CODE_EXPIRE = 5L;
 
     /**
      * 发送注册验证码

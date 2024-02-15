@@ -42,6 +42,7 @@ public class SysUserController {
         SysUserLoginVO sysUserLoginVO = sysUserService.login(sysUserLoginDTO);
         return BaseResponse.success(sysUserLoginVO);
     }
+
     @SaIgnore
     @Operation(summary = "注册")
     @PostMapping("/register")
@@ -84,7 +85,7 @@ public class SysUserController {
                 (dto.getId() != null && dto.getId() != StpUtil.getLoginIdAsLong())) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
-        SysUser user = sysUserService.saveOrUpdate(dto,false);
+        SysUser user = sysUserService.saveOrUpdate(dto, false);
 
         return BaseResponse.success(user);
     }

@@ -77,7 +77,7 @@ public class SysUserServiceImpl implements SysUserService {
         //设置默认信息
         sysUserSaveDTO.setUserStatus((byte) 1);
         sysUserSaveDTO.setRoles(List.of(2L));
-        this.saveOrUpdate(sysUserSaveDTO,true);
+        this.saveOrUpdate(sysUserSaveDTO, true);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public SysUser saveOrUpdate(SysUserSaveDTO dto,boolean isRegister) {
+    public SysUser saveOrUpdate(SysUserSaveDTO dto, boolean isRegister) {
         SysUser user = new SysUser();
         BeanUtils.copyProperties(dto, user);
         if (StringUtils.isNoneEmpty(user.getPassword())) {
@@ -151,7 +151,7 @@ public class SysUserServiceImpl implements SysUserService {
         }
         if (dto.getId() != null) {
             //更新操作
-            if (isRegister){
+            if (isRegister) {
                 //如果是注册模式则手动赋值修改者、修改时间
                 user.setUpdateBy(0L);
                 user.setUpdateTime(LocalDateTime.now());
@@ -163,7 +163,7 @@ public class SysUserServiceImpl implements SysUserService {
             //新增操作
             user.setAccessKey(RandomUtil.randomString(16));
             user.setSecretKey(RandomUtil.randomString(32));
-            if (isRegister){
+            if (isRegister) {
                 //如果是注册模式则手动赋值创建者、创建时间、修改者、修改时间
                 user.setCreateBy(0L);
                 user.setCreateTime(LocalDateTime.now());

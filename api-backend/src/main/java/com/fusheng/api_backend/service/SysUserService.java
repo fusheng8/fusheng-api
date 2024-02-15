@@ -50,7 +50,7 @@ public interface SysUserService {
      * @param isRegister 是否是注册 注册下会手动设置创建者、创建时间、更新者、更新时间
      * @return
      */
-    SysUser saveOrUpdate(SysUserSaveDTO dto,boolean isRegister);
+    SysUser saveOrUpdate(SysUserSaveDTO dto, boolean isRegister);
 
     /**
      * 扣除用户余额
