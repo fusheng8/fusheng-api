@@ -78,6 +78,9 @@ public class SysUserServiceImpl implements SysUserService {
         sysUserSaveDTO.setUserStatus((byte) 1);
         sysUserSaveDTO.setRoles(List.of(2L));
         this.saveOrUpdate(sysUserSaveDTO, true);
+
+        //删除该验证码缓存
+        bucket.delete();
     }
 
     @Override
@@ -250,5 +253,21 @@ public class SysUserServiceImpl implements SysUserService {
         SysUser user = sysUserMapper.selectOne(queryWrapper);
         bucket.set(user.getId());
         return user;
+    }
+
+    @Override
+    public String resetSecretKey(SysUser user, String code) {
+        //验证验证码
+        RBucket<String> bucket = redissonClient.getBucket(RedisName.CODE_RESER_SK + user.getEmail());
+        if (!code.equals(bucket.get())) {
+            throw new BusinessException(ErrorCode.CODE_ERROR);
+        }
+        String sk = RandomUtil.randomString(32);
+        user.setSecretKey(sk);
+        sysUserMapper.updateById(user);
+        this.updateById(user);
+        //删除该验证码缓存
+        bucket.delete();
+        return sk;
     }
 }

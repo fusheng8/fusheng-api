@@ -41,6 +41,10 @@ public class RedisName {
      * 注册验证码: :邮箱
      */
     public static final String CODE_REGISTER = COMMON_PREFIX + "code:" + "code_register:";
+    /**
+     * 重置sk验证码: :邮箱
+     */
+    public static final String CODE_RESER_SK = COMMON_PREFIX + "code:" + "code_reset_sk:";
 
 }
 

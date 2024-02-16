@@ -84,4 +84,12 @@ public interface SysUserService {
      * @return
      */
     SysUser getByAccessKey(String accessKey);
+
+    /**
+     * 重置SecretKey
+     *
+     * @param user
+     * @return
+     */
+    String resetSecretKey(SysUser user, String code);
 }

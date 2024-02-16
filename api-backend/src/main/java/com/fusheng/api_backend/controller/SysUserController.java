@@ -19,6 +19,7 @@ import com.fusheng.common.model.vo.SysUser.SysUserPageQueryVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -126,17 +127,14 @@ public class SysUserController {
 
     @Operation(summary = "重置SecretKey")
     @GetMapping("/resetSecretKey")
-    public BaseResponse<String> resetSecretKey() {
+    public BaseResponse<String> resetSecretKey(@Validated @NotBlank String code) {
         long id = StpUtil.getLoginIdAsLong();
         SysUser user = sysUserService.getById(id);
         if (user == null) throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
-        String sk = RandomUtil.randomString(32);
-        user.setSecretKey(sk);
-        sysUserService.updateById(user);
-        return BaseResponse.success(sk);
+        return BaseResponse.success(sysUserService.resetSecretKey(user,code));
     }
 
-    @Operation(summary = "重置SecretKey")
+    @Operation(summary = "注销")
     @GetMapping("/logout")
     public BaseResponse logout() {
         StpUtil.logout();
