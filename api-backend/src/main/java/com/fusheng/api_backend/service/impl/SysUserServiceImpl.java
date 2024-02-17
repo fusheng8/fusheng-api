@@ -163,7 +163,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public SysUser saveOrUpdate(SysUserSaveDTO dto, boolean isRegister) {
+    public SysUser saveOrUpdate(SysUserSaveDTO dto, boolean isMybatisAutoFill) {
         SysUser user = new SysUser();
         BeanUtils.copyProperties(dto, user);
         if (StringUtils.isNoneEmpty(user.getPassword())) {
@@ -176,7 +176,7 @@ public class SysUserServiceImpl implements SysUserService {
         }
         if (dto.getId() != null) {
             //更新操作
-            if (isRegister) {
+            if (isMybatisAutoFill) {
                 //如果是注册模式则手动赋值修改者、修改时间
                 user.setUpdateBy(0L);
                 user.setUpdateTime(LocalDateTime.now());
@@ -188,7 +188,7 @@ public class SysUserServiceImpl implements SysUserService {
             //新增操作
             user.setAccessKey(RandomUtil.randomString(16));
             user.setSecretKey(RandomUtil.randomString(32));
-            if (isRegister) {
+            if (isMybatisAutoFill) {
                 //如果是注册模式则手动赋值创建者、创建时间、修改者、修改时间
                 user.setCreateBy(0L);
                 user.setCreateTime(LocalDateTime.now());
@@ -258,7 +258,19 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public void updateById(SysUser user) {
+    public void updateById(SysUser user, boolean isMybatisAutoFill) {
+        if (StringUtils.isNoneEmpty(user.getPassword())) {
+            //密码加密
+            String password = PasswordUtil.encrypt(user.getPassword());
+            user.setPassword(password);
+        }
+
+        if (isMybatisAutoFill) {
+            //因为不是Web环境，所以mybatisplus的自动填充会失效，这里手动填充
+            user.setUpdateTime(LocalDateTime.now());
+            user.setUpdateBy(user.getId());
+        }
+
         sysUserMapper.updateById(user);
         //修改用户缓存
         redissonClient.getBucket(RedisKey.USER_BY_ID + user.getId()).set(user);
@@ -287,9 +299,28 @@ public class SysUserServiceImpl implements SysUserService {
         String sk = RandomUtil.randomString(32);
         user.setSecretKey(sk);
         sysUserMapper.updateById(user);
-        this.updateById(user);
+        this.updateById(user,false);
         //删除该验证码缓存
         bucket.delete();
         return sk;
+    }
+
+    @Override
+    public void resetPassword(SysUserResetPasswordDTO dto) {
+        //验证验证码
+        RBucket<String> bucket = redissonClient.getBucket(RedisKey.CODE_RESET_PASSWORD_CODE + dto.getEmail());
+        if (!dto.getCode().equals(bucket.get())) {
+            throw new BusinessException(ErrorCode.CODE_ERROR);
+        }
+        SysUser user = sysUserMapper.selectOne(new QueryWrapper<SysUser>().eq("email", dto.getEmail()));
+        if (user == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        SysUser sysUser = new SysUser();
+        sysUser.setId(user.getId());
+        sysUser.setPassword(dto.getPassword());
+        this.updateById(sysUser,true);
+        //删除该验证码缓存
+        bucket.delete();
     }
 }

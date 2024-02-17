@@ -23,4 +23,10 @@ public interface MailService {
      */
     void sendEmailLoginCode(String email);
 
+    /**
+     * 发送重置密码验证码
+     *
+     * @param email
+     */
+    void sendResetPasswordCode(String email);
 }

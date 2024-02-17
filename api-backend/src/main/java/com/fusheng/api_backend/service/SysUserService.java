@@ -75,7 +75,7 @@ public interface SysUserService {
      *
      * @param user
      */
-    void updateById(SysUser user);
+    void updateById(SysUser user,boolean isMybatisAutoFill);
 
     /**
      * 根据accessKey获取用户
@@ -92,4 +92,11 @@ public interface SysUserService {
      * @return
      */
     String resetSecretKey(SysUser user, String code);
+
+    /**
+     * 重置密码
+     *
+     * @param dto
+     */
+    void resetPassword(SysUserResetPasswordDTO dto);
 }

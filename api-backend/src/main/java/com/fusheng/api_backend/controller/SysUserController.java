@@ -138,4 +138,12 @@ public class SysUserController {
         StpUtil.logout();
         return BaseResponse.success();
     }
+
+    @Operation(summary = "重置密码")
+    @PostMapping("/resetPassword")
+    @SaIgnore
+    public BaseResponse resetPassword(@RequestBody @Validated SysUserResetPasswordDTO sysUserResetPasswordDTO) {
+        sysUserService.resetPassword(sysUserResetPasswordDTO);
+        return BaseResponse.success();
+    }
 }

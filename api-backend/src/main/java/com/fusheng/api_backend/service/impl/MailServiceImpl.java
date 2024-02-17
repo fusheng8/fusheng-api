@@ -23,6 +23,8 @@ public class MailServiceImpl implements MailService {
     private static final long RESET_SK_CODE_EXPIRE = 5L;
     //邮箱登录验证码时效
     private static final long EMAIL_LOGIN_CODE_EXPIRE = 5L;
+    //重置密码验证码时效
+    private static final long RESET_PASSWORD_CODE_EXPIRE = 5L;
     @Resource
     private RedissonClient redissonClient;
     @Resource
@@ -73,6 +75,19 @@ public class MailServiceImpl implements MailService {
         sendCodeEmail(email, code, "邮箱登录", EMAIL_LOGIN_CODE_EXPIRE);
         //将验证码存入redis
         bucket.set(code, EMAIL_LOGIN_CODE_EXPIRE, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public void sendResetPasswordCode(String email) {
+        RBucket<String> bucket = redissonClient.getBucket(RedisKey.CODE_RESET_PASSWORD_CODE + email);
+        //检测是否频繁
+        if (bucket.isExists()) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "发送验证码过于频繁，请稍后再试。");
+        }
+        String code = RandomUtil.randomNumbers(6);
+        sendCodeEmail(email, code, "重置密码", RESET_PASSWORD_CODE_EXPIRE);
+        //将验证码存入redis
+        bucket.set(code, RESET_PASSWORD_CODE_EXPIRE, TimeUnit.MINUTES);
     }
 
     private void sendCodeEmail(String email, String code, String operate, long expire) {

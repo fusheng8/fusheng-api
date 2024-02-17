@@ -52,4 +52,11 @@ public class CodeController {
         mailService.sendEmailLoginCode(email);
         return BaseResponse.success();
     }
+    @Operation(summary = "获取重置密码验证码")
+    @GetMapping("/sendResetPasswordCode")
+    public BaseResponse sendResetPasswordCode(@RequestParam @Validated
+                                               @Email(message = "邮箱格式错误") String email) {
+        mailService.sendResetPasswordCode(email);
+        return BaseResponse.success();
+    }
 }
