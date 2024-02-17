@@ -6,7 +6,7 @@ import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.mapper.SysRoleMapper;
 import com.fusheng.api_backend.service.SysRoleService;
-import com.fusheng.common.constant.RedisName;
+import com.fusheng.common.constant.RedisKey;
 import com.fusheng.common.model.dto.SysRole.SysRolePageQueryDTO;
 import com.fusheng.common.model.entity.SysRole;
 import com.google.gson.JsonParser;
@@ -61,7 +61,7 @@ public class SysRoleServiceImpl implements SysRoleService {
             sysRoleMapper.insert(sysRole);
         } else {
             sysRoleMapper.updateById(sysRole);
-            redissonClient.getBucket(RedisName.ROLE_BY_ID + sysRole.getId()).set(sysRole);
+            redissonClient.getBucket(RedisKey.ROLE_BY_ID + sysRole.getId()).set(sysRole);
         }
     }
 
@@ -70,7 +70,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         int i = sysRoleMapper.deleteBatchIds(ids);
         if (i > 0) {
             ids.forEach(id -> {
-                redissonClient.getBucket(RedisName.ROLE_BY_ID + id).delete();
+                redissonClient.getBucket(RedisKey.ROLE_BY_ID + id).delete();
             });
             return true;
         }
@@ -79,7 +79,7 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     public SysRole getById(Long id) {
-        RBucket<SysRole> bucket = redissonClient.getBucket(RedisName.ROLE_BY_ID + id);
+        RBucket<SysRole> bucket = redissonClient.getBucket(RedisKey.ROLE_BY_ID + id);
         if (bucket.isExists()) {
             return bucket.get();
         }

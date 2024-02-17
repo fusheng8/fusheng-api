@@ -4,7 +4,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.crypto.digest.DigestAlgorithm;
 import cn.hutool.crypto.digest.Digester;
 import com.fusheng.GatewayService;
-import com.fusheng.common.constant.RedisName;
+import com.fusheng.common.constant.RedisKey;
 import com.fusheng.common.model.entity.ApiInfo;
 import com.fusheng.common.model.entity.SysUser;
 import jakarta.annotation.Resource;
@@ -153,7 +153,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         }
 
         // 验证nonce
-        RBucket<String> bucket = redissonClient.getBucket(RedisName.API_INFO_NONCE + accessKey + ":" + nonce);
+        RBucket<String> bucket = redissonClient.getBucket(RedisKey.API_INFO_NONCE + accessKey + ":" + nonce);
         if (bucket.isExists()) {
             return false;
         } else {

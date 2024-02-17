@@ -10,6 +10,8 @@ import com.fusheng.common.model.entity.SysUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.Email;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +32,7 @@ public class CodeController {
         mailService.sendRegisterCode(email);
         return BaseResponse.success();
     }
+
     @Operation(summary = "获取重置sk验证码")
     @GetMapping("/sendResetSkCode")
     @SaCheckLogin
@@ -40,6 +43,13 @@ public class CodeController {
             return BaseResponse.error(ErrorCode.NOT_FOUND_ERROR, "用户不存在");
         }
         mailService.sendResetSkCode(user.getEmail());
+        return BaseResponse.success();
+    }
+    @Operation(summary = "获取邮箱登录验证码")
+    @GetMapping("/sendEmailLoginCode")
+    public BaseResponse sendEmailLoginCode(@RequestParam @Validated
+                                               @Email(message = "邮箱格式错误") String email) {
+        mailService.sendEmailLoginCode(email);
         return BaseResponse.success();
     }
 }

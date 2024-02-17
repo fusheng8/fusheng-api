@@ -4,7 +4,6 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fusheng.api_backend.common.BaseResponse;
 import com.fusheng.api_backend.common.ErrorCode;
@@ -40,8 +39,7 @@ public class SysUserController {
     @Operation(summary = "登录")
     @PostMapping("/login")
     public BaseResponse<SysUserLoginVO> login(@Validated @RequestBody SysUserLoginDTO sysUserLoginDTO) {
-        SysUserLoginVO sysUserLoginVO = sysUserService.login(sysUserLoginDTO);
-        return BaseResponse.success(sysUserLoginVO);
+        return BaseResponse.success( sysUserService.login(sysUserLoginDTO));
     }
 
     @SaIgnore
@@ -131,7 +129,7 @@ public class SysUserController {
         long id = StpUtil.getLoginIdAsLong();
         SysUser user = sysUserService.getById(id);
         if (user == null) throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
-        return BaseResponse.success(sysUserService.resetSecretKey(user,code));
+        return BaseResponse.success(sysUserService.resetSecretKey(user, code));
     }
 
     @Operation(summary = "注销")

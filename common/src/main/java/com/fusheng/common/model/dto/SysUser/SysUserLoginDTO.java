@@ -1,7 +1,6 @@
 package com.fusheng.common.model.dto.SysUser;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -9,15 +8,24 @@ import java.io.Serializable;
 @Data
 public class SysUserLoginDTO implements Serializable {
     /**
+     * 登录方式 account-账号登录 email-邮箱登录
+     */
+    @NotBlank(message = "登录方式不能为空")
+    private String type;
+    /**
      * 用户账号
      */
-    @NotBlank(message = "用户账号不能为空")
     private String username;
     /**
      * 密码
      */
-    @NotBlank(message = "密码不能为空")
-    @Size(min = 6, max = 20, message = "密码长度为6-20位")
-    private String password;
+    private String password;    /**
+     * 密码
+     */
+    private String email;
+    /**
+     * 密码
+     */
+    private String code;
 
 }

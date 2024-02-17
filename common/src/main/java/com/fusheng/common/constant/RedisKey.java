@@ -3,7 +3,7 @@ package com.fusheng.common.constant;
 /**
  * redis key 常量
  */
-public class RedisName {
+public class RedisKey {
     /**
      * 公共前缀
      */
@@ -45,6 +45,10 @@ public class RedisName {
      * 重置sk验证码: :邮箱
      */
     public static final String CODE_RESER_SK = COMMON_PREFIX + "code:" + "code_reset_sk:";
+    /**
+     * 邮箱登录验证码: :邮箱
+     */
+    public static final String CODE_EMAIL_LOGIN = COMMON_PREFIX + "code:" + "code_email_login:";
 
 }
 

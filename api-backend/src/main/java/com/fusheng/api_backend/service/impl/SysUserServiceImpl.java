@@ -9,7 +9,7 @@ import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.mapper.SysUserMapper;
 import com.fusheng.api_backend.service.SysUserService;
 import com.fusheng.api_backend.utils.PasswordUtil;
-import com.fusheng.common.constant.RedisName;
+import com.fusheng.common.constant.RedisKey;
 import com.fusheng.common.model.dto.SysUser.*;
 import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
@@ -39,28 +39,50 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     public SysUserLoginVO login(SysUserLoginDTO dto) {
-        QueryWrapper<SysUser> sysUserQueryWrapper = new QueryWrapper<>();
-        sysUserQueryWrapper.eq("username", dto.getUsername());
-        SysUser sysUser = sysUserMapper.selectOne(sysUserQueryWrapper);
-        if (sysUser == null) {
-            throw new BusinessException(ErrorCode.ACCOUNT_OR_PASSWORD_ERROR);
-        }
+        SysUser sysUser = null;
+        if ("account".equals(dto.getType())) {
+            if (StringUtils.isAnyBlank(dto.getUsername(), dto.getPassword())) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号或密码不能为空");
+            }
+            QueryWrapper<SysUser> sysUserQueryWrapper = new QueryWrapper<>();
+            sysUserQueryWrapper.eq("username", dto.getUsername());
+            sysUser = sysUserMapper.selectOne(sysUserQueryWrapper);
+            if (sysUser == null) {
+                throw new BusinessException(ErrorCode.ACCOUNT_OR_PASSWORD_ERROR);
+            }
 
-        //加密密码
-        String encryptPassword = PasswordUtil.encrypt(dto.getPassword());
-        if (!sysUser.getPassword().equals(encryptPassword)) {
-            throw new BusinessException(ErrorCode.ACCOUNT_OR_PASSWORD_ERROR);
+            //加密密码
+            String encryptPassword = PasswordUtil.encrypt(dto.getPassword());
+            if (!sysUser.getPassword().equals(encryptPassword)) {
+                throw new BusinessException(ErrorCode.ACCOUNT_OR_PASSWORD_ERROR);
+            }
+
+        }
+        if ("email".equals(dto.getType())) {
+            if (StringUtils.isAnyBlank(dto.getEmail(), dto.getCode())) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号或密码不能为空");
+            }
+            RBucket<String> bucket = redissonClient.getBucket(RedisKey.CODE_EMAIL_LOGIN + dto.getEmail());
+            if (!dto.getCode().equals(bucket.get())) {
+                throw new BusinessException(ErrorCode.CODE_ERROR);
+            }
+            sysUser = sysUserMapper.selectOne(new QueryWrapper<SysUser>().eq("email", dto.getEmail()));
+            if (sysUser == null) {
+                throw new BusinessException(ErrorCode.ACCOUNT_OR_PASSWORD_ERROR);
+            }
+            bucket.delete();
         }
         StpUtil.login(sysUser.getId());
         SysUserLoginVO sysUserLoginVO = new SysUserLoginVO();
         sysUserLoginVO.setToken(StpUtil.getTokenInfo().getTokenValue());
         return sysUserLoginVO;
+
     }
 
     @Override
     public void register(SysUserRegisterDTO dto) {
         //验证验证码
-        RBucket<String> bucket = redissonClient.getBucket(RedisName.CODE_REGISTER + dto.getEmail());
+        RBucket<String> bucket = redissonClient.getBucket(RedisKey.CODE_REGISTER + dto.getEmail());
         if (!dto.getCode().equals(bucket.get())) {
             throw new BusinessException(ErrorCode.CODE_ERROR);
         }
@@ -85,7 +107,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     public SysUser getById(long id) {
-        RBucket<SysUser> bucket = redissonClient.getBucket(RedisName.USER_BY_ID + id);
+        RBucket<SysUser> bucket = redissonClient.getBucket(RedisKey.USER_BY_ID + id);
         if (bucket.isExists()) {
             return bucket.get();
         }
@@ -137,7 +159,7 @@ public class SysUserServiceImpl implements SysUserService {
         sysUser.setRoles(new Gson().toJson(dto.getRoleIds()));
         sysUserMapper.updateById(sysUser);
         //修改用户缓存
-        redissonClient.getBucket(RedisName.USER_BY_ID + dto.getUserId()).set(sysUser);
+        redissonClient.getBucket(RedisKey.USER_BY_ID + dto.getUserId()).set(sysUser);
     }
 
     @Override
@@ -161,7 +183,7 @@ public class SysUserServiceImpl implements SysUserService {
             }
             sysUserMapper.updateById(user);
             //修改用户缓存
-            redissonClient.getBucket(RedisName.USER_BY_ID + dto.getId()).set(user);
+            redissonClient.getBucket(RedisKey.USER_BY_ID + dto.getId()).set(user);
         } else {
             //新增操作
             user.setAccessKey(RandomUtil.randomString(16));
@@ -182,7 +204,7 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public boolean deductUserBalance(long userId, boolean isAdd, String amount) {
         // 对用户加锁
-        RLock lock = redissonClient.getLock(RedisName.USER_BALANCE_LOCK + userId);
+        RLock lock = redissonClient.getLock(RedisKey.USER_BALANCE_LOCK + userId);
         try {
             // 只有一个线程能获取到锁
             if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
@@ -202,7 +224,7 @@ public class SysUserServiceImpl implements SysUserService {
                     user.setUpdateBy(user.getId());
                     sysUserMapper.updateById(user);
                     //修改用户缓存
-                    redissonClient.getBucket(RedisName.USER_BY_ID + userId).set(user);
+                    redissonClient.getBucket(RedisKey.USER_BY_ID + userId).set(user);
                 } else {
                     return false;
                 }
@@ -228,7 +250,7 @@ public class SysUserServiceImpl implements SysUserService {
                 if (id == 1L || id == 2L) {
                     throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "系统账号不可删除");
                 }
-                redissonClient.getBucket(RedisName.USER_BY_ID + id).delete();
+                redissonClient.getBucket(RedisKey.USER_BY_ID + id).delete();
             });
             return true;
         }
@@ -239,12 +261,12 @@ public class SysUserServiceImpl implements SysUserService {
     public void updateById(SysUser user) {
         sysUserMapper.updateById(user);
         //修改用户缓存
-        redissonClient.getBucket(RedisName.USER_BY_ID + user.getId()).set(user);
+        redissonClient.getBucket(RedisKey.USER_BY_ID + user.getId()).set(user);
     }
 
     @Override
     public SysUser getByAccessKey(String accessKey) {
-        RBucket<Long> bucket = redissonClient.getBucket(RedisName.USER_ID_BY_ACCESS_KEY + accessKey);
+        RBucket<Long> bucket = redissonClient.getBucket(RedisKey.USER_ID_BY_ACCESS_KEY + accessKey);
         if (bucket.isExists()) {
             return this.getById(bucket.get());
         }
@@ -258,7 +280,7 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public String resetSecretKey(SysUser user, String code) {
         //验证验证码
-        RBucket<String> bucket = redissonClient.getBucket(RedisName.CODE_RESER_SK + user.getEmail());
+        RBucket<String> bucket = redissonClient.getBucket(RedisKey.CODE_RESER_SK + user.getEmail());
         if (!code.equals(bucket.get())) {
             throw new BusinessException(ErrorCode.CODE_ERROR);
         }

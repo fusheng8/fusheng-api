@@ -7,7 +7,7 @@ import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.mapper.ApiInfoMapper;
 import com.fusheng.api_backend.service.ApiInfoService;
-import com.fusheng.common.constant.RedisName;
+import com.fusheng.common.constant.RedisKey;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoPageQueryDTO;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
 import com.fusheng.common.model.entity.ApiInfo;
@@ -77,7 +77,7 @@ public class ApiInfoServiceImpl implements ApiInfoService {
         } else {
             int i = apiInfoMapper.updateById(apiInfo);
             if (i > 0) {
-                redissonClient.getBucket(RedisName.API_INFO_BY_ID + dto.getId()).set(apiInfo);
+                redissonClient.getBucket(RedisKey.API_INFO_BY_ID + dto.getId()).set(apiInfo);
                 return true;
             }
             return false;
@@ -90,7 +90,7 @@ public class ApiInfoServiceImpl implements ApiInfoService {
         if (apiInfo == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        redissonClient.getBucket(RedisName.API_INFO_BY_ID + id).set(apiInfo);
+        redissonClient.getBucket(RedisKey.API_INFO_BY_ID + id).set(apiInfo);
         return apiInfo;
     }
 
@@ -104,7 +104,7 @@ public class ApiInfoServiceImpl implements ApiInfoService {
         int i = apiInfoMapper.deleteBatchIds(ids);
         if (i > 0) {
             ids.forEach(id -> {
-                redissonClient.getBucket(RedisName.API_INFO_BY_ID + id).delete();
+                redissonClient.getBucket(RedisKey.API_INFO_BY_ID + id).delete();
             });
             return true;
         }
@@ -113,7 +113,7 @@ public class ApiInfoServiceImpl implements ApiInfoService {
 
     @Override
     public ApiInfo getByUrl(String apiUrl) {
-        RBucket<Long> bucket = redissonClient.getBucket(RedisName.API_INFO_ID_BY_URL + apiUrl);
+        RBucket<Long> bucket = redissonClient.getBucket(RedisKey.API_INFO_ID_BY_URL + apiUrl);
         if (bucket.isExists()) {
             return this.getById(bucket.get());
         }

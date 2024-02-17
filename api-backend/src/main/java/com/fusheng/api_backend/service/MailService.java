@@ -7,9 +7,9 @@ public interface MailService {
     /**
      * 发送注册验证码
      *
-     * @param to
+     * @param email
      */
-    void sendRegisterCode(String to);
+    void sendRegisterCode(String email);
 
     /**
      * 发送重置sk验证码
@@ -17,4 +17,10 @@ public interface MailService {
      * @param email
      */
     void sendResetSkCode(String email);
+
+    /**
+     * 发送邮箱登录验证码
+     */
+    void sendEmailLoginCode(String email);
+
 }
