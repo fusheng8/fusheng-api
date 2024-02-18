@@ -8,9 +8,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fusheng.api_backend.common.BaseResponse;
 import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
+import com.fusheng.api_backend.service.BalanceOrderServie;
 import com.fusheng.api_backend.service.SysRoleService;
 import com.fusheng.api_backend.service.SysUserService;
 import com.fusheng.common.model.dto.SysUser.*;
+import com.fusheng.common.model.entity.BalanceOrder;
 import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.vo.SysUser.SysUserInfoVO;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
@@ -19,6 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,12 +37,14 @@ public class SysUserController {
     private SysUserService sysUserService;
     @Resource
     private SysRoleService sysRoleService;
+    @Resource
+    private BalanceOrderServie balanceOrderServie;
 
     @SaIgnore
     @Operation(summary = "登录")
     @PostMapping("/login")
     public BaseResponse<SysUserLoginVO> login(@Validated @RequestBody SysUserLoginDTO sysUserLoginDTO) {
-        return BaseResponse.success( sysUserService.login(sysUserLoginDTO));
+        return BaseResponse.success(sysUserService.login(sysUserLoginDTO));
     }
 
     @SaIgnore
@@ -145,5 +150,47 @@ public class SysUserController {
     public BaseResponse resetPassword(@RequestBody @Validated SysUserResetPasswordDTO sysUserResetPasswordDTO) {
         sysUserService.resetPassword(sysUserResetPasswordDTO);
         return BaseResponse.success();
+    }
+
+    @Operation(summary = "用户充值积分")
+    @GetMapping("/payBalance")
+    public BaseResponse<String> payBalance(@RequestParam
+                                           @Validated
+                                           @NotBlank(message = "充值积分不能为空")
+                                           @Positive(message = "充值积分必须大于0")
+                                           String count) {
+        if (count.indexOf('.') != -1) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "充值积分必须为整数");
+        }
+
+        // 创建充值订单
+        ;
+        long l = balanceOrderServie.payBalance(count, StpUtil.getLoginIdAsLong());
+        return BaseResponse.success(Long.toString(l));
+    }
+
+    @Operation(summary = "获取充值界面")
+    @GetMapping(value = "/payBalancePage", produces = "text/html")
+    @SaIgnore
+    public String getPayBalancePage(@RequestParam @Validated @NotBlank(message = "订单号不能为空") String orderId,
+                                    @RequestParam @Validated @NotBlank(message = "返回地址不能为空") String returnUrl) {
+
+        BalanceOrder balanceOrder = balanceOrderServie.getById(Long.parseLong(orderId));
+        if (balanceOrder == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "订单不存在");
+        }
+
+        return balanceOrderServie.getPayPage(balanceOrder, returnUrl);
+    }
+
+    @Operation(summary = "用户获取是否充值成功")
+    @GetMapping("/payBalanceStatus")
+    public BaseResponse<Integer> getPayBalancePage(@RequestParam @Validated @NotBlank(message = "订单号不能为空") String orderId) {
+        BalanceOrder balanceOrder = balanceOrderServie.getById(Long.parseLong(orderId));
+        //判断用户是否有权限
+        if (balanceOrder.getUserId() != StpUtil.getLoginIdAsLong()) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        return BaseResponse.success(balanceOrder.getState());
     }
 }

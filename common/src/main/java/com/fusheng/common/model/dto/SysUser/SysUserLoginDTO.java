@@ -19,7 +19,8 @@ public class SysUserLoginDTO implements Serializable {
     /**
      * 密码
      */
-    private String password;    /**
+    private String password;
+    /**
      * 密码
      */
     private String email;

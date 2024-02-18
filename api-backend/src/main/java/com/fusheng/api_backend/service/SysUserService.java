@@ -75,7 +75,7 @@ public interface SysUserService {
      *
      * @param user
      */
-    void updateById(SysUser user,boolean isMybatisAutoFill);
+    void updateById(SysUser user, boolean isMybatisAutoFill);
 
     /**
      * 根据accessKey获取用户
@@ -99,4 +99,5 @@ public interface SysUserService {
      * @param dto
      */
     void resetPassword(SysUserResetPasswordDTO dto);
+
 }

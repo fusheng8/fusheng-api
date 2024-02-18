@@ -15,6 +15,7 @@ import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
 import com.google.gson.Gson;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBucket;
 import org.redisson.api.RLock;
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
+@Slf4j
 public class SysUserServiceImpl implements SysUserService {
     @Resource
     private SysUserMapper sysUserMapper;
@@ -158,8 +160,6 @@ public class SysUserServiceImpl implements SysUserService {
         sysUser.setId(dto.getUserId());
         sysUser.setRoles(new Gson().toJson(dto.getRoleIds()));
         sysUserMapper.updateById(sysUser);
-        //修改用户缓存
-        redissonClient.getBucket(RedisKey.USER_BY_ID + dto.getUserId()).set(sysUser);
     }
 
     @Override
@@ -183,7 +183,7 @@ public class SysUserServiceImpl implements SysUserService {
             }
             sysUserMapper.updateById(user);
             //修改用户缓存
-            redissonClient.getBucket(RedisKey.USER_BY_ID + dto.getId()).set(user);
+            redissonClient.getBucket(RedisKey.USER_BY_ID + dto.getId()).delete();
         } else {
             //新增操作
             user.setAccessKey(RandomUtil.randomString(16));
@@ -273,7 +273,7 @@ public class SysUserServiceImpl implements SysUserService {
 
         sysUserMapper.updateById(user);
         //修改用户缓存
-        redissonClient.getBucket(RedisKey.USER_BY_ID + user.getId()).set(user);
+        redissonClient.getBucket(RedisKey.USER_BY_ID + user.getId()).delete();
     }
 
     @Override
@@ -299,7 +299,7 @@ public class SysUserServiceImpl implements SysUserService {
         String sk = RandomUtil.randomString(32);
         user.setSecretKey(sk);
         sysUserMapper.updateById(user);
-        this.updateById(user,false);
+        this.updateById(user, false);
         //删除该验证码缓存
         bucket.delete();
         return sk;
@@ -319,8 +319,10 @@ public class SysUserServiceImpl implements SysUserService {
         SysUser sysUser = new SysUser();
         sysUser.setId(user.getId());
         sysUser.setPassword(dto.getPassword());
-        this.updateById(sysUser,true);
+        this.updateById(sysUser, true);
         //删除该验证码缓存
         bucket.delete();
     }
+
+
 }

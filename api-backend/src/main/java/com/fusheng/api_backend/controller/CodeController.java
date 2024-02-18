@@ -45,17 +45,19 @@ public class CodeController {
         mailService.sendResetSkCode(user.getEmail());
         return BaseResponse.success();
     }
+
     @Operation(summary = "获取邮箱登录验证码")
     @GetMapping("/sendEmailLoginCode")
     public BaseResponse sendEmailLoginCode(@RequestParam @Validated
-                                               @Email(message = "邮箱格式错误") String email) {
+                                           @Email(message = "邮箱格式错误") String email) {
         mailService.sendEmailLoginCode(email);
         return BaseResponse.success();
     }
+
     @Operation(summary = "获取重置密码验证码")
     @GetMapping("/sendResetPasswordCode")
     public BaseResponse sendResetPasswordCode(@RequestParam @Validated
-                                               @Email(message = "邮箱格式错误") String email) {
+                                              @Email(message = "邮箱格式错误") String email) {
         mailService.sendResetPasswordCode(email);
         return BaseResponse.success();
     }
