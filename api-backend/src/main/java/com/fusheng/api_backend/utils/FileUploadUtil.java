@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Slf4j
 public class FileUploadUtil {
     private static final String FILE_URL = "https://fs-im-kefu.7moor-fs1.com/";
     private static final String FILE_UPLOAD_URL = "https://up.qiniu.com/";
@@ -25,6 +24,16 @@ public class FileUploadUtil {
         String fileName = multipartFile.getOriginalFilename();
         Map<String, Object> param = getCredentials(fileName);
         File file = transferToFile(multipartFile);
+        param.put("file", file);
+        String res = HttpUtil.post(FILE_UPLOAD_URL, param);
+        // 删除临时文件
+        FileUtil.del(file);
+        JSONObject entries = JSONUtil.parseObj(res);
+        return FILE_URL + entries.getStr("key");
+    }
+    public static String uploadFile(File file) {
+        String fileName = file.getName();
+        Map<String, Object> param = getCredentials(fileName);
         param.put("file", file);
         String res = HttpUtil.post(FILE_UPLOAD_URL, param);
         // 删除临时文件
@@ -52,7 +61,6 @@ public class FileUploadUtil {
         String res = HttpUtil.post(CREATE_FILE_URL, param);
         JSONObject entries = JSONUtil.parseObj(res);
         if (!entries.getStr("code").equals("0")) {
-            log.error("获取文件上传凭证失败{}", res);
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "文件上传失败");
         }
         JSONObject data = entries.getJSONObject("data");

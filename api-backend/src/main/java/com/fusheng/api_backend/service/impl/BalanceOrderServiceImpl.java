@@ -7,12 +7,14 @@ import com.fusheng.api_backend.mapper.BalanceOrderMapper;
 import com.fusheng.api_backend.properties.AlipayProperties;
 import com.fusheng.api_backend.service.BalanceOrderServie;
 import com.fusheng.common.model.entity.BalanceOrder;
+import com.fusheng.common.model.entity.Withdraw;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -22,8 +24,6 @@ public class BalanceOrderServiceImpl implements BalanceOrderServie {
     private AlipayTemplate alipayTemplate;
     @Resource
     private BalanceOrderMapper balanceOrderMapper;
-    @Resource
-    private AlipayProperties alipayProperties;
 
     @Override
     public String getPayPage(BalanceOrder balanceOrder, String returnUrl) {
@@ -61,6 +61,17 @@ public class BalanceOrderServiceImpl implements BalanceOrderServie {
 
     @Override
     public void updateById(BalanceOrder balanceOrder) {
+        balanceOrder.setUpdateTime(LocalDateTime.now());
         balanceOrderMapper.updateById(balanceOrder);
+    }
+
+    @Override
+    public void insertWithdrawOrder(Withdraw withdraw) {
+        BalanceOrder balanceOrder = new BalanceOrder();
+        balanceOrder.setPayTime(LocalDateTime.now());
+        balanceOrder.setAmount(withdraw.getAmount());
+        balanceOrder.setName("提现积分");
+        balanceOrder.setUserId(1L);
+        balanceOrderMapper.insert(balanceOrder);
     }
 }

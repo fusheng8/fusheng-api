@@ -129,7 +129,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 
                 //如果响应码是200，那么就扣积分
                 if (statusCode == HttpStatus.OK) {
-                    if (!"0".equals(apiInfo.getReduceBalance()) && !gatewayService.deductUserBalance(user.getId(), apiInfo.getReduceBalance())) {
+                    if (!"0".equals(apiInfo.getReduceBalance()) && !gatewayService.changeUserBalance(user.getId(), apiInfo).getKey()) {
                         //扣除积分失败
                         return authenticateFailed(response, "扣除积分失败");
                     }

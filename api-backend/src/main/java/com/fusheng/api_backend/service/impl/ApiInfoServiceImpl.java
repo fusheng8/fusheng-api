@@ -42,6 +42,12 @@ public class ApiInfoServiceImpl implements ApiInfoService {
         if (dto.getMethod() != null) {
             queryWrapper.eq("method", dto.getMethod());
         }
+        if (dto.getMethod() != null) {
+            queryWrapper.eq("method", dto.getMethod());
+        }
+        if (dto.getUserId() != null) {
+            queryWrapper.eq("user_id", dto.getUserId());
+        }
         if (dto.getOrder() != null && StringUtils.isNotBlank(dto.getColumn())) {
             switch (dto.getOrder()) {
                 case asc:
@@ -95,11 +101,6 @@ public class ApiInfoServiceImpl implements ApiInfoService {
     }
 
     @Override
-    public List<ApiInfo> getAllList() {
-        return apiInfoMapper.selectList(null);
-    }
-
-    @Override
     public boolean removeByIds(List<Long> ids) {
         int i = apiInfoMapper.deleteBatchIds(ids);
         if (i > 0) {
@@ -122,5 +123,23 @@ public class ApiInfoServiceImpl implements ApiInfoService {
         ApiInfo apiInfo = apiInfoMapper.selectOne(queryWrapper);
         bucket.set(apiInfo.getId());
         return apiInfo;
+    }
+
+    @Override
+    public List<ApiInfo> queryByIds(List<Long> ids) {
+        return apiInfoMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public Boolean reviewApi(Long id, Integer status) {
+        ApiInfo apiInfo = new ApiInfo();
+        apiInfo.setId(id);
+        apiInfo.setStatus(status);
+        int i = apiInfoMapper.updateById(apiInfo);
+        if (i > 0) {
+            redissonClient.getBucket(RedisKey.API_INFO_BY_ID + id).delete();
+            return true;
+        }
+        return false;
     }
 }

@@ -30,13 +30,6 @@ public interface ApiInfoService {
     ApiInfo getById(Long id);
 
     /**
-     * 获取所有接口信息
-     *
-     * @return
-     */
-    List<ApiInfo> getAllList();
-
-    /**
      * 批量删除接口信息
      *
      * @param ids
@@ -51,4 +44,21 @@ public interface ApiInfoService {
      * @return
      */
     ApiInfo getByUrl(String apiUrl);
+
+    /**
+     * 根据id批量查询接口信息
+     *
+     * @param ids
+     * @return
+     */
+    List<ApiInfo> queryByIds(List<Long> ids);
+
+    /**
+     * 审核接口
+     *
+     * @param id
+     * @param status
+     * @return
+     */
+    Boolean reviewApi(Long id, Integer status);
 }

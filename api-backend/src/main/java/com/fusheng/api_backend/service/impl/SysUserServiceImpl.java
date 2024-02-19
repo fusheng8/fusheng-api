@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.mapper.SysUserMapper;
+import com.fusheng.api_backend.service.BalanceOrderServie;
 import com.fusheng.api_backend.service.SysUserService;
 import com.fusheng.api_backend.utils.PasswordUtil;
 import com.fusheng.common.constant.RedisKey;
@@ -15,6 +16,7 @@ import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
 import com.google.gson.Gson;
 import jakarta.annotation.Resource;
+import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBucket;
@@ -24,20 +26,23 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
 @Service
-@Transactional(rollbackFor = Exception.class)
 @Slf4j
 public class SysUserServiceImpl implements SysUserService {
     @Resource
     private SysUserMapper sysUserMapper;
     @Resource
     private RedissonClient redissonClient;
+    @Resource
+    private BalanceOrderServie balanceOrderServie;
 
     @Override
     public SysUserLoginVO login(SysUserLoginDTO dto) {
@@ -202,7 +207,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public boolean deductUserBalance(long userId, boolean isAdd, String amount) {
+    public Pair<Boolean,String> deductUserBalance(long userId, boolean isAdd, String amount) {
         // 对用户加锁
         RLock lock = redissonClient.getLock(RedisKey.USER_BALANCE_LOCK + userId);
         try {
@@ -210,13 +215,13 @@ public class SysUserServiceImpl implements SysUserService {
             if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
                 SysUser user = sysUserMapper.selectById(userId);
                 // 判断余额是否足够
-                BigInteger bigInteger1 = new BigInteger(user.getBalance());
-                BigInteger bigInteger2 = new BigInteger(amount);
-                if (isAdd || bigInteger1.compareTo(bigInteger2) >= 0) {
+                BigDecimal bigDecimal1 = new BigDecimal(user.getBalance()).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal bigDecimal2 = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
+                if (isAdd || bigDecimal1.compareTo(bigDecimal2) >= 0) {
                     if (isAdd) {
-                        user.setBalance(bigInteger1.add(bigInteger2).toString());
+                        user.setBalance(bigDecimal1.add(bigDecimal2).toString());
                     } else {
-                        user.setBalance(bigInteger1.subtract(bigInteger2).toString());
+                        user.setBalance(bigDecimal1.subtract(bigDecimal2).toString());
                     }
 
                     //因为不是Web环境，所以mybatisplus的自动填充会失效，这里手动填充
@@ -226,7 +231,7 @@ public class SysUserServiceImpl implements SysUserService {
                     //修改用户缓存
                     redissonClient.getBucket(RedisKey.USER_BY_ID + userId).set(user);
                 } else {
-                    return false;
+                    return new Pair<>(false, "余额不足");
                 }
             }
         } catch (InterruptedException e) {
@@ -238,7 +243,7 @@ public class SysUserServiceImpl implements SysUserService {
                 lock.unlock();
             }
         }
-        return true;
+        return new Pair<>(true, null);
     }
 
     @Override

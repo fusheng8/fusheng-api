@@ -11,9 +11,12 @@ import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.service.BalanceOrderServie;
 import com.fusheng.api_backend.service.SysRoleService;
 import com.fusheng.api_backend.service.SysUserService;
+import com.fusheng.api_backend.service.WithdrawService;
 import com.fusheng.common.model.dto.SysUser.*;
+import com.fusheng.common.model.dto.withdraw.WithdrawDTO;
 import com.fusheng.common.model.entity.BalanceOrder;
 import com.fusheng.common.model.entity.SysUser;
+import com.fusheng.common.model.entity.Withdraw;
 import com.fusheng.common.model.vo.SysUser.SysUserInfoVO;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
 import com.fusheng.common.model.vo.SysUser.SysUserPageQueryVO;
@@ -22,10 +25,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import javafx.util.Pair;
 import org.springframework.beans.BeanUtils;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.file.WatchService;
 import java.util.List;
 
 @RestController
@@ -39,6 +47,8 @@ public class SysUserController {
     private SysRoleService sysRoleService;
     @Resource
     private BalanceOrderServie balanceOrderServie;
+    @Resource
+    private WithdrawService withdrawService;
 
     @SaIgnore
     @Operation(summary = "登录")
@@ -193,4 +203,36 @@ public class SysUserController {
         }
         return BaseResponse.success(balanceOrder.getState());
     }
+
+    @Transactional
+    @Operation(summary = "提现")
+    @PostMapping("/withdrawBalance")
+    @SaCheckLogin
+    public BaseResponse withdrawBalance(@RequestBody @Validated WithdrawDTO dto) {
+        BigDecimal bigDecimal = new BigDecimal(dto.getAmount());
+        //小于100分不允许提现
+        if (bigDecimal.compareTo(new BigDecimal("100")) < 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "提现积分必须大于100分");
+        }
+        //扣除手续费5%
+        BigDecimal count = bigDecimal.multiply(new BigDecimal("0.0095"));
+        Withdraw withdraw = new Withdraw();
+        BeanUtils.copyProperties(dto, withdraw);
+        withdraw.setUserId(StpUtil.getLoginIdAsLong());
+        withdraw.setAmount(count.setScale(2, RoundingMode.HALF_UP).toString());
+        withdraw.setStatus(1);
+
+        // 扣除用户积分
+        Pair<Boolean, String> pair = sysUserService.deductUserBalance(StpUtil.getLoginIdAsLong(), false, dto.getAmount());
+        if (!pair.getKey()) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, pair.getValue());
+        }
+        // 创建提现订单
+        balanceOrderServie.insertWithdrawOrder(withdraw);
+        withdrawService.withdrawBalance(withdraw);
+
+        return BaseResponse.success();
+    }
+
+
 }

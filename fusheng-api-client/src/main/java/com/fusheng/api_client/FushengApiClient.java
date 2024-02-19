@@ -10,12 +10,12 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FushengApiClient {
     // 请求地址
-    private static final String url = "http://43.136.38.19:5756/api/wl/yan/yiyan";
+    private static final String url = "http://localhost:5756/api/wl/yan/yiyan";
     private String accessKey;
     private String secretKey;
 
     public static void main(String[] args) {
-        FushengApiClient fushengApiClient = new FushengApiClient("8f7bdswr92zbkcun4fbe64xf", "zkrd7kxtepzfrg26jh0b1bsncvkej85i");
+        FushengApiClient fushengApiClient = new FushengApiClient("dsasdaads", "asdasd");
         String result = fushengApiClient.send();
         System.out.println(result);
 

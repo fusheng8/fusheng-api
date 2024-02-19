@@ -26,4 +26,9 @@ public class ApiInfoPageQueryDTO extends PageQueryDTO implements Serializable {
      */
     private RequestMethodEnum method;
 
+    /**
+     * 发布人
+     */
+    private Long userId;
+
 }

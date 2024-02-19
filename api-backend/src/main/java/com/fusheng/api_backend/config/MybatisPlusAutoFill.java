@@ -24,17 +24,17 @@ public class MybatisPlusAutoFill implements MetaObjectHandler {
         LocalDateTime hasUpdateTime = (LocalDateTime) this.getFieldValByName("updateTime", metaObject);
         Long hasCreateBy = (Long) this.getFieldValByName("createBy", metaObject);
         Long hasUpdateBy = (Long) this.getFieldValByName("updateBy", metaObject);
-        if (hasCreateTime == null) {
+        if (metaObject.hasGetter("createTime") && hasCreateTime == null) {
             this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, now);
         }
-        if (hasUpdateTime == null) {
+        if (metaObject.hasGetter("updateTime") && hasUpdateTime == null) {
             this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, now);
         }
-        if (hasCreateBy == null) {
+        if (metaObject.hasGetter("createBy") && hasCreateBy == null) {
             long userId = StpUtil.getLoginIdAsLong();
             this.strictInsertFill(metaObject, "createBy", Long.class, userId);
         }
-        if (hasUpdateBy == null) {
+        if (metaObject.hasGetter("updateBy") && hasUpdateBy == null) {
             long userId = StpUtil.getLoginIdAsLong();
             this.strictInsertFill(metaObject, "updateBy", Long.class, userId);
         }
@@ -48,12 +48,12 @@ public class MybatisPlusAutoFill implements MetaObjectHandler {
         LocalDateTime hasUpdateTime = (LocalDateTime) this.getFieldValByName("updateTime", metaObject);
         Long hasUpdateBy = (Long) this.getFieldValByName("updateBy", metaObject);
 
-        if (hasUpdateTime == null) {
+        if (metaObject.hasGetter("updateTime") && hasUpdateTime == null) {
             LocalDateTime now = LocalDateTime.now();
             this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, now);
         }
 
-        if (hasUpdateBy == null) {
+        if (metaObject.hasGetter("updateBy") && hasUpdateBy == null) {
             long userId = StpUtil.getLoginIdAsLong();
             this.strictUpdateFill(metaObject, "updateBy", Long.class, userId);
         }

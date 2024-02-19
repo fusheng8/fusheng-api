@@ -1,14 +1,19 @@
 package com.fusheng.api_backend.dubbo_service;
 
 import com.fusheng.GatewayService;
+import com.fusheng.api_backend.common.ErrorCode;
+import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.service.ApiInfoService;
 import com.fusheng.api_backend.service.SysUserService;
 import com.fusheng.common.model.entity.ApiInfo;
 import com.fusheng.common.model.entity.SysUser;
 import jakarta.annotation.Resource;
+import javafx.util.Pair;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.transaction.annotation.Transactional;
 
 @DubboService
+@Transactional(rollbackFor = Exception.class)
 public class GatewayServiceImpl implements GatewayService {
     @Resource
     private SysUserService userService;
@@ -40,15 +45,25 @@ public class GatewayServiceImpl implements GatewayService {
     }
 
     /**
-     * 扣除用户余额
+     * 改变用户余额
      *
      * @param userId
-     * @param amount
+     * @param apiInfo
      * @return boolean 是否扣除成功
      */
     @Override
-    public boolean deductUserBalance(long userId, String amount) {
-        return userService.deductUserBalance(userId, false, amount);
+    public Pair<Boolean, String> changeUserBalance(long userId, ApiInfo apiInfo) {
+        String amount = apiInfo.getReduceBalance();
+        Pair<Boolean, String> b1 = userService.deductUserBalance(userId, false, amount);
+        if (!b1.getKey()) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "扣除失败");
+        }
+        Pair<Boolean, String> b2 = userService.deductUserBalance(apiInfo.getUserId(), true, amount);
+        if (!b2.getKey()) {
+            userService.deductUserBalance(userId, true, amount);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "扣除失败");
+        }
+        return new Pair<>(true, "扣除成功");
     }
 
 

@@ -2,6 +2,7 @@ package com.fusheng;
 
 import com.fusheng.common.model.entity.ApiInfo;
 import com.fusheng.common.model.entity.SysUser;
+import javafx.util.Pair;
 
 public interface GatewayService {
 
@@ -22,10 +23,12 @@ public interface GatewayService {
     ApiInfo getApiInfoByApiUrl(String apiUrl);
 
     /**
+     * 改变用户余额
+     *
      * @param userId
-     * @param amount
+     * @param apiInfo
      * @return boolean 是否扣除成功
      */
-    boolean deductUserBalance(long userId, String amount);
+    Pair<Boolean,String> changeUserBalance(long userId, ApiInfo apiInfo);
 
 }

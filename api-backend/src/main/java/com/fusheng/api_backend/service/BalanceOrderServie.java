@@ -1,6 +1,7 @@
 package com.fusheng.api_backend.service;
 
 import com.fusheng.common.model.entity.BalanceOrder;
+import com.fusheng.common.model.entity.Withdraw;
 
 public interface BalanceOrderServie {
     /**
@@ -34,4 +35,12 @@ public interface BalanceOrderServie {
      * @param balanceOrder
      */
     void updateById(BalanceOrder balanceOrder);
+
+    /**
+     * 提现
+     *
+     * @param withdraw
+     */
+    void insertWithdrawOrder(Withdraw withdraw);
+
 }
