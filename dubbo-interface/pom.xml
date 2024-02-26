@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.fusheng</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>api-common</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>

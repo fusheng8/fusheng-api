@@ -6,6 +6,7 @@ import cn.hutool.crypto.digest.Digester;
 import com.fusheng.GatewayService;
 import com.fusheng.common.constant.RedisKey;
 import com.fusheng.common.model.entity.ApiInfo;
+import com.fusheng.common.model.entity.RequestLogs;
 import com.fusheng.common.model.entity.SysUser;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -128,12 +129,22 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 //                    }
 
                 //如果响应码是200，那么就扣积分
+                //记录日志
+                RequestLogs requestLogs = new RequestLogs();
+                requestLogs.setRequestBody(request.getBody().toString());
+                requestLogs.setRequestHeaders(headers.toString());
+                requestLogs.setRequestMethod(request.getMethod().toString());
+                requestLogs.setRequestUrl(uri);
+                requestLogs.setResponseCode(statusCode.value());
+                gatewayService.saveRequestLogs(requestLogs);
+
                 if (statusCode == HttpStatus.OK) {
                     if (!"0".equals(apiInfo.getReduceBalance()) && !gatewayService.changeUserBalance(user.getId(), apiInfo).getKey()) {
                         //扣除积分失败
                         return authenticateFailed(response, "扣除积分失败");
                     }
                 }
+
                 return super.writeWith(body);
             }
         };

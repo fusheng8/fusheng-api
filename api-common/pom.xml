@@ -10,7 +10,7 @@
         <version>1.0</version>
     </parent>
 
-    <artifactId>common</artifactId>
+    <artifactId>api-common</artifactId>
     <packaging>jar</packaging>
 
     <properties>

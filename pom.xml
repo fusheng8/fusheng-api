@@ -18,7 +18,7 @@
         <module>api-backend</module>
         <module>api-gateway</module>
         <module>dubbo-interface</module>
-        <module>common</module>
+        <module>api-common</module>
     </modules>
     <properties>
         <java.version>17</java.version>
