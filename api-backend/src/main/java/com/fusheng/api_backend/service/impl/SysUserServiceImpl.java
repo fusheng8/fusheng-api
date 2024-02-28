@@ -24,11 +24,8 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -207,7 +204,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public Pair<Boolean,String> deductUserBalance(long userId, boolean isAdd, String amount) {
+    public Pair<Boolean, String> deductUserBalance(long userId, boolean isAdd, String amount) {
         // 对用户加锁
         RLock lock = redissonClient.getLock(RedisKey.USER_BALANCE_LOCK + userId);
         try {
@@ -215,13 +212,13 @@ public class SysUserServiceImpl implements SysUserService {
             if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
                 SysUser user = sysUserMapper.selectById(userId);
                 // 判断余额是否足够
-                BigDecimal bigDecimal1 = new BigDecimal(user.getBalance()).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal bigDecimal2 = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
-                if (isAdd || bigDecimal1.compareTo(bigDecimal2) >= 0) {
+                BigInteger bigInteger1 = new BigInteger(user.getBalance());
+                BigInteger bigInteger2 = new BigInteger(amount);
+                if (isAdd || bigInteger1.compareTo(bigInteger2) >= 0) {
                     if (isAdd) {
-                        user.setBalance(bigDecimal1.add(bigDecimal2).toString());
+                        user.setBalance(bigInteger1.add(bigInteger2).toString());
                     } else {
-                        user.setBalance(bigDecimal1.subtract(bigDecimal2).toString());
+                        user.setBalance(bigInteger1.subtract(bigInteger2).toString());
                     }
 
                     //因为不是Web环境，所以mybatisplus的自动填充会失效，这里手动填充

@@ -37,6 +37,12 @@ public class RedisKey {
      * 根据url查询api的id :url
      */
     public static final String API_INFO_ID_BY_URL = COMMON_PREFIX + "api_info:" + "api_info_id_by_url:";
+
+    /**
+     * 根据mappingUrl查询api的id :mappingUrl
+     */
+    public static final String API_INFO_ID_BY_MAPPING_URL = COMMON_PREFIX + "api_info:" + "api_info_id_by_mapping_url:";
+
     /**
      * 注册验证码: :邮箱
      */

@@ -19,7 +19,6 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -62,12 +61,17 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
-        String uri = request.getURI().toString();
+        String path = request.getPath().toString();
 
         // 判断是否存在该接口
-        ApiInfo apiInfo = gatewayService.getApiInfoByApiUrl(uri.split("\\?")[0]);
+        ApiInfo apiInfo = gatewayService.getApiInfoByMappingUrl(path);
         if (apiInfo == null) {
-            return authenticateFailed(response, "无效的接口");
+            return authenticateFailed(response, "接口不存在");
+        }
+
+        //判断接口状态是否是已上线
+        if (apiInfo.getStatus() != 3) {
+            return authenticateFailed(response, "接口状态异常");
         }
 
         HttpHeaders headers = request.getHeaders();
@@ -86,6 +90,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
             return authenticateFailed(response, "认证失败");
         }
 
+
         BigInteger bigInteger1 = new BigInteger(user.getBalance());
         BigInteger bigInteger2 = new BigInteger(apiInfo.getReduceBalance());
 
@@ -95,38 +100,12 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
             return authenticateFailed(response, "积分不足");
         }
 
-
-        DataBufferFactory bufferFactory = response.bufferFactory();
         HttpStatusCode statusCode = response.getStatusCode();
-
 
         ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(response) {
 
             @Override
             public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
-                // ToDo 记录日志
-//                    if (body instanceof Flux) {
-//                        Flux<? extends DataBuffer> fluxBody = Flux.from(body);
-//                        //
-//                        return super.writeWith(fluxBody.map(dataBuffer -> {
-//                            byte[] content = new byte[dataBuffer.readableByteCount()];
-//                            dataBuffer.read(content);
-//                            DataBufferUtils.release(dataBuffer);//释放掉内存
-//                            // 构建日志
-//                            StringBuilder sb2 = new StringBuilder(200);
-//                            sb2.append("<--- {} {} \n");
-//                            List<Object> rspArgs = new ArrayList<>();
-//                            rspArgs.add(response.getStatusCode());
-//                            //rspArgs.add(requestUrl);
-//                            String data = new String(content, StandardCharsets.UTF_8);//data
-//                            sb2.append(data);
-//                            log.info("测试");
-//                            log.info(sb2.toString(), rspArgs.toArray());//log.info("<-- {} {}\n", originalResponse.getStatusCode(), data);
-//                            return bufferFactory.wrap(content);
-//                        }));
-//                    } else {
-//                        log.error("<--- {} 响应code异常", getStatusCode());
-//                    }
 
                 //如果响应码是200，那么就扣积分
                 //记录日志
@@ -134,7 +113,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                 requestLogs.setRequestBody(request.getBody().toString());
                 requestLogs.setRequestHeaders(headers.toString());
                 requestLogs.setRequestMethod(request.getMethod().toString());
-                requestLogs.setRequestUrl(uri);
+                requestLogs.setRequestUrl(request.getURI().toString());
                 requestLogs.setResponseCode(statusCode.value());
                 gatewayService.saveRequestLogs(requestLogs);
 

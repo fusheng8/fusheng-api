@@ -42,7 +42,7 @@ public class ApiInfoController {
     @Operation(summary = "批量删除接口信息")
     @GetMapping("/deleteByIds")
     public BaseResponse<Boolean> deleteByIds(@RequestParam List<Long> ids) {
-        if (StpUtil.hasRole("admin")) {
+        if (!StpUtil.hasRole("admin")) {
             //如果不是是管理员，只能删除自己的接口
             List<ApiInfo> apiInfoList = apiInfoService.queryByIds(ids);
             long userId = StpUtil.getLoginIdAsLong();
@@ -62,7 +62,7 @@ public class ApiInfoController {
     @PostMapping("/saveOrUpdate")
     public BaseResponse<Boolean> saveOrUpdate(@RequestBody ApiInfoSavaOrUpdateDTO dto) {
         //如果不是管理员强制修改状态为待审核
-        if (!StpUtil.hasRole("admin")){
+        if (!StpUtil.hasRole("admin")) {
             dto.setStatus(0);
         }
         boolean res = apiInfoService.saveOrUpdate(dto);
@@ -79,7 +79,7 @@ public class ApiInfoController {
     @Operation(summary = "管理员审核接口")
     @GetMapping("/reviewApi")
     @SaCheckRole("admin")
-    public BaseResponse<Boolean> reviewApi(@RequestParam Long id,@RequestParam  Integer status) {
+    public BaseResponse<Boolean> reviewApi(@RequestParam Long id, @RequestParam Integer status) {
         if (id == null || status == null) throw new BusinessException(ErrorCode.PARAMS_ERROR);
         return BaseResponse.success(apiInfoService.reviewApi(id, status));
     }

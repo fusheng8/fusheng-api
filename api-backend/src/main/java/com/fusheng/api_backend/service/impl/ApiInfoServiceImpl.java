@@ -20,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ApiInfoServiceImpl implements ApiInfoService {
@@ -113,15 +114,15 @@ public class ApiInfoServiceImpl implements ApiInfoService {
     }
 
     @Override
-    public ApiInfo getByUrl(String apiUrl) {
-        RBucket<Long> bucket = redissonClient.getBucket(RedisKey.API_INFO_ID_BY_URL + apiUrl);
+    public ApiInfo getByMappingUrl(String mappingUrl) {
+        RBucket<Long> bucket = redissonClient.getBucket(RedisKey.API_INFO_ID_BY_MAPPING_URL + mappingUrl);
         if (bucket.isExists()) {
             return this.getById(bucket.get());
         }
         QueryWrapper<ApiInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("url", apiUrl);
+        queryWrapper.eq("mapping_url", mappingUrl);
         ApiInfo apiInfo = apiInfoMapper.selectOne(queryWrapper);
-        bucket.set(apiInfo.getId());
+        bucket.set(apiInfo.getId(), 60, TimeUnit.MINUTES);
         return apiInfo;
     }
 

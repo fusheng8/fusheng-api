@@ -40,10 +40,10 @@ public interface ApiInfoService {
     /**
      * 根据url获取接口信息
      *
-     * @param apiUrl
+     * @param mappingUrl
      * @return
      */
-    ApiInfo getByUrl(String apiUrl);
+    ApiInfo getByMappingUrl(String mappingUrl);
 
     /**
      * 根据id批量查询接口信息

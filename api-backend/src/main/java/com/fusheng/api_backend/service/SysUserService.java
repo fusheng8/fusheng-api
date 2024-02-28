@@ -61,7 +61,7 @@ public interface SysUserService {
      * @param amount
      * @return
      */
-    Pair<Boolean,String> deductUserBalance(long userId, boolean isAdd, String amount);
+    Pair<Boolean, String> deductUserBalance(long userId, boolean isAdd, String amount);
 
     /**
      * 批量删除用户

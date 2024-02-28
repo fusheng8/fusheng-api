@@ -4,7 +4,6 @@ import com.alipay.api.domain.AlipayTradeWapPayModel;
 import com.alipay.api.response.AlipayTradePagePayResponse;
 import com.fusheng.api_backend.config.AlipayTemplate;
 import com.fusheng.api_backend.mapper.BalanceOrderMapper;
-import com.fusheng.api_backend.properties.AlipayProperties;
 import com.fusheng.api_backend.service.BalanceOrderServie;
 import com.fusheng.common.model.entity.BalanceOrder;
 import com.fusheng.common.model.entity.Withdraw;

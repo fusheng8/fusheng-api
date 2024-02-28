@@ -22,7 +22,12 @@ public class ApiInfoSavaOrUpdateDTO implements Serializable {
     private String name;
 
     /**
-     * 接口地址
+     * 映射的网关路径
+     */
+    private String mappingUrl;
+
+    /**
+     * 实际的接口地址
      */
     private String url;
 

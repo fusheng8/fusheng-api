@@ -6,7 +6,6 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.fusheng.api_backend.common.ErrorCode;
 import com.fusheng.api_backend.exception.BusinessException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -31,6 +30,7 @@ public class FileUploadUtil {
         JSONObject entries = JSONUtil.parseObj(res);
         return FILE_URL + entries.getStr("key");
     }
+
     public static String uploadFile(File file) {
         String fileName = file.getName();
         Map<String, Object> param = getCredentials(fileName);

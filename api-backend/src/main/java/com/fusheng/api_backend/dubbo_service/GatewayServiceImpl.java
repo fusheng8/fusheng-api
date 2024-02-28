@@ -7,6 +7,7 @@ import com.fusheng.api_backend.service.ApiInfoService;
 import com.fusheng.api_backend.service.RequestLogsService;
 import com.fusheng.api_backend.service.SysUserService;
 import com.fusheng.common.model.entity.ApiInfo;
+import com.fusheng.common.model.entity.KVPair;
 import com.fusheng.common.model.entity.RequestLogs;
 import com.fusheng.common.model.entity.SysUser;
 import jakarta.annotation.Resource;
@@ -38,14 +39,14 @@ public class GatewayServiceImpl implements GatewayService {
     }
 
     /**
-     * 根据apiUrl获取api信息
+     * 根据mappingUrl获取api信息
      *
-     * @param apiUrl
+     * @param mappingUrl
      * @return
      */
     @Override
-    public ApiInfo getApiInfoByApiUrl(String apiUrl) {
-        return apiInfoService.getByUrl(apiUrl);
+    public ApiInfo getApiInfoByMappingUrl(String mappingUrl) {
+        return apiInfoService.getByMappingUrl(mappingUrl);
     }
 
     /**
@@ -56,7 +57,7 @@ public class GatewayServiceImpl implements GatewayService {
      * @return boolean 是否扣除成功
      */
     @Override
-    public Pair<Boolean, String> changeUserBalance(long userId, ApiInfo apiInfo) {
+    public KVPair<Boolean, String> changeUserBalance(long userId, ApiInfo apiInfo) {
         String amount = apiInfo.getReduceBalance();
         Pair<Boolean, String> b1 = userService.deductUserBalance(userId, false, amount);
         if (!b1.getKey()) {
@@ -67,7 +68,7 @@ public class GatewayServiceImpl implements GatewayService {
             userService.deductUserBalance(userId, true, amount);
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "扣除失败");
         }
-        return new Pair<>(true, "扣除成功");
+        return new KVPair<>(true, "扣除成功");
     }
 
     /**
