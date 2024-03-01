@@ -20,8 +20,8 @@ spring:
     password: NHFXOAWVGGQHBLJA  # 发件人邮箱密码
 
 fusheng:
-  # 加密秘钥
-  encrypt-key: 186cfa4cd57b
+  encrypt-key: 186cfa4cd57b  # 加密秘钥
+  gateway-url: http://43.136.38.19:5756 # api网关地址
 
 dubbo:
   application:

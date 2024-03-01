@@ -30,6 +30,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -118,7 +119,8 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                 gatewayService.saveRequestLogs(requestLogs);
 
                 if (statusCode == HttpStatus.OK) {
-                    if (!"0".equals(apiInfo.getReduceBalance()) && !gatewayService.changeUserBalance(user.getId(), apiInfo).getKey()) {
+                    //如果是自己调用自己的接口，积分不变
+                    if (!Objects.equals(user.getId(), apiInfo.getUserId()) &&!"0".equals(apiInfo.getReduceBalance()) && !gatewayService.changeUserBalance(user.getId(), apiInfo).getKey()) {
                         //扣除积分失败
                         return authenticateFailed(response, "扣除积分失败");
                     }

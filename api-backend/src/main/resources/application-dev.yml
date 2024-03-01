@@ -40,8 +40,8 @@ knife4j:
 
 
 fusheng:
-  # 加密秘钥
-  encrypt-key: 186cfa4cd57b
+  encrypt-key: 186cfa4cd57b  # 加密秘钥
+  gateway-url: http://localhost:5756 # api网关地址
 
 dubbo:
   application:

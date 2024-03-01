@@ -5,7 +5,6 @@ import cn.hutool.crypto.digest.DigestAlgorithm;
 import cn.hutool.crypto.digest.Digester;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
 import lombok.AllArgsConstructor;
 
 import java.util.Map;
@@ -13,7 +12,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class FushengApiClient {
     // 请求地址
-    private static final String url = "http://localhost:5756/api/wl/yan/yiyan";
+    private static final String url = "${url}";
     private String accessKey;
     private String secretKey;
 
@@ -25,7 +24,12 @@ public class FushengApiClient {
         // 计算签名
         String sign = getSign(accessKey, secretKey, timestamp, nonce);
         // 设置请求
+        <#if method == "GET">
         HttpRequest request = HttpRequest.get(url)
+        </#if>
+        <#if method == "POST">
+        HttpRequest request = HttpRequest.post(url)
+        </#if>
                 .header("AccessKey", accessKey)
                 .header("Timestamp", timestamp)
                 .header("Sign", sign)

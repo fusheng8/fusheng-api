@@ -87,6 +87,11 @@
             <artifactId>alipay-sdk-java</artifactId>
             <version>4.38.200.ALL</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
     </dependencies>
 
 

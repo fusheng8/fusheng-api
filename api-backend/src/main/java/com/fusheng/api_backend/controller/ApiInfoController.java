@@ -15,6 +15,8 @@ import com.fusheng.common.model.vo.ApiInfo.ApiInfoPageQueryVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -82,5 +84,12 @@ public class ApiInfoController {
     public BaseResponse<Boolean> reviewApi(@RequestParam Long id, @RequestParam Integer status) {
         if (id == null || status == null) throw new BusinessException(ErrorCode.PARAMS_ERROR);
         return BaseResponse.success(apiInfoService.reviewApi(id, status));
+    }
+
+    @Operation(summary = "生成sdk")
+    @GetMapping("/generateSdk")
+    public BaseResponse<String> generateSdk(@RequestParam @Validated @NotNull(message = "id不能为空") Long id) {
+
+        return BaseResponse.success(apiInfoService.generateSdk(id));
     }
 }

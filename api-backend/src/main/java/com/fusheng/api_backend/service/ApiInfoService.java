@@ -61,4 +61,12 @@ public interface ApiInfoService {
      * @return
      */
     Boolean reviewApi(Long id, Integer status);
+
+    /**
+     * 根据接口id生成sdk
+     *
+     * @param id
+     * @return
+     */
+    String generateSdk(Long id);
 }

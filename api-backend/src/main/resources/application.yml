@@ -20,7 +20,11 @@ spring:
       mail.smtp.socketFactory.port: 465  # SSL连接使用的端口号
       mail.smtp.socketFactory.class: javax.net.ssl.SSLSocketFactory  # SSL连接的SocketFactory类
       mail.smtp.socketFactory.fallback: false  # SSL连接失败时不回退到非加密连接
-
+  freemarker:
+    cache: false #缓存是否开启
+    charset: UTF-8 #编码格式
+    suffix: .ftl #模板文件后缀
+    template-loader-path: classpath:/templates/ftl/ #模板文件前缀
 
 mybatis-plus:
   configuration:
