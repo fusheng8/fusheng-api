@@ -10,6 +10,7 @@ import com.fusheng.api_backend.exception.BusinessException;
 import com.fusheng.api_backend.service.ApiInfoService;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoPageQueryDTO;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
+import com.fusheng.common.model.dto.ApiInfo.ApiInfoUpdateSdkDTO;
 import com.fusheng.common.model.entity.ApiInfo;
 import com.fusheng.common.model.vo.ApiInfo.ApiInfoPageQueryVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -91,5 +92,18 @@ public class ApiInfoController {
     public BaseResponse<String> generateSdk(@RequestParam @Validated @NotNull(message = "id不能为空") Long id) {
 
         return BaseResponse.success(apiInfoService.generateSdk(id));
+    }
+    @Operation(summary = "修改sdk")
+    @PostMapping("/updateApiSdk")
+    @SaCheckLogin
+    public BaseResponse updateSdk(@RequestBody @Validated ApiInfoUpdateSdkDTO dto) {
+        if (!StpUtil.hasRole("admin")) {
+            //如果不是是管理员，只能删除自己的接口
+            ApiInfo apiInfo = apiInfoService.getById(dto.getId());
+            if (!apiInfo.getUserId().equals(dto.getId()))
+                throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有权限删除别人的接口");
+        }
+        apiInfoService.updateSdk(dto);
+        return BaseResponse.success();
     }
 }

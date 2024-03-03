@@ -1,8 +1,8 @@
 package com.fusheng.common.model.dto.ApiInfo;
 
-import com.fusheng.common.model.entity.RequestHeaderParam;
-import com.fusheng.common.model.entity.RequestParam;
-import com.fusheng.common.model.entity.ResponseParam;
+import com.fusheng.common.model.entity.apiInfoObject.RequestHeaderParam;
+import com.fusheng.common.model.entity.apiInfoObject.RequestParam;
+import com.fusheng.common.model.entity.apiInfoObject.ResponseParam;
 import com.fusheng.common.model.enums.RequestMethodEnum;
 import lombok.Data;
 

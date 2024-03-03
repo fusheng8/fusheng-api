@@ -1,4 +1,4 @@
-package com.fusheng.common.model.entity;
+package com.fusheng.common.model.entity.apiInfoObject;
 
 import com.fusheng.common.model.enums.RequestMethodEnum;
 import lombok.Data;

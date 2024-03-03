@@ -3,6 +3,7 @@ package com.fusheng.api_backend.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoPageQueryDTO;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
+import com.fusheng.common.model.dto.ApiInfo.ApiInfoUpdateSdkDTO;
 import com.fusheng.common.model.entity.ApiInfo;
 
 import java.util.List;
@@ -69,4 +70,10 @@ public interface ApiInfoService {
      * @return
      */
     String generateSdk(Long id);
+
+    /**
+     * 修改sdk
+     * @param dto
+     */
+    void updateSdk(ApiInfoUpdateSdkDTO dto);
 }

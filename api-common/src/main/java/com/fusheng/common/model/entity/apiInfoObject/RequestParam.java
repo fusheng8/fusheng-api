@@ -1,4 +1,4 @@
-package com.fusheng.common.model.entity;
+package com.fusheng.common.model.entity.apiInfoObject;
 
 import lombok.Data;
 

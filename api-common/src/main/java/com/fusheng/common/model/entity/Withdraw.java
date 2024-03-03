@@ -6,6 +6,9 @@ import lombok.Data;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * 提现实体
+ */
 @Data
 @TableName("withdraw")
 public class Withdraw implements Serializable {

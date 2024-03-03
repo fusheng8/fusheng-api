@@ -13,8 +13,10 @@ import com.fusheng.api_backend.utils.FileUploadUtil;
 import com.fusheng.common.constant.RedisKey;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoPageQueryDTO;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
+import com.fusheng.common.model.dto.ApiInfo.ApiInfoUpdateSdkDTO;
 import com.fusheng.common.model.entity.ApiInfo;
 import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.annotation.Resource;
@@ -188,13 +190,20 @@ public class ApiInfoServiceImpl implements ApiInfoService {
             //上传打出来的jar包
             //jar包路径
             String jarPath = sdkPath + "api-sdk/target/fusheng-api-client.jar";
-
             return FileUploadUtil.uploadFile(new File(jarPath));
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @Override
+    public void updateSdk(ApiInfoUpdateSdkDTO dto) {
+        ApiInfoSavaOrUpdateDTO apiInfoSavaOrUpdateDTO = new ApiInfoSavaOrUpdateDTO();
+        apiInfoSavaOrUpdateDTO.setId(dto.getId());
+        apiInfoSavaOrUpdateDTO.setSdk(new Gson().toJson(dto.getSdk()));
+        this.saveOrUpdate(apiInfoSavaOrUpdateDTO);
     }
 
     /**
