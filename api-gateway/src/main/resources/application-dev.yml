@@ -10,13 +10,18 @@ spring:
       host: 127.0.0.1
       port: 6379
       database: 3
-
+  cloud:
+    gateway:
+      httpserver:
+        wiretap: true
+      httpclient:
+        wiretap: true
 logging:
   level:
     org:
       springframework:
         cloud:
-          gateway: error
+          gateway: trace
 
 dubbo:
   application:

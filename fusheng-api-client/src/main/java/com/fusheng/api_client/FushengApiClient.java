@@ -5,7 +5,6 @@ import cn.hutool.crypto.digest.DigestAlgorithm;
 import cn.hutool.crypto.digest.Digester;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
 import lombok.AllArgsConstructor;
 
 import java.util.Map;
@@ -17,7 +16,7 @@ public class FushengApiClient {
     private String accessKey;
     private String secretKey;
 
-    public String send(Map<String,String> headers, Map<String,String> params) {
+    public String send(Map<String, String> headers, Map<String, String> params) {
         // 获取时间戳
         String timestamp = String.valueOf(System.currentTimeMillis());
         // 获取随机数
@@ -32,8 +31,8 @@ public class FushengApiClient {
                 .header("Nonce", nonce);
 
         // 设置请求信息
-         request = request.headerMap(headers, true);
-         request = request.formStr(params);
+        request = request.headerMap(headers, true);
+        request = request.formStr(params);
 
 
         try (HttpResponse response = request.execute()) {

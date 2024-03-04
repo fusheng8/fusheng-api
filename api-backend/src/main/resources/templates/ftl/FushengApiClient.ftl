@@ -16,7 +16,7 @@ public class FushengApiClient {
     private String accessKey;
     private String secretKey;
 
-    public String send(Map<String,String> headers, Map<String,String> params) {
+    public String send(Map<String, String> headers, Map<String, String> params) {
         // 获取时间戳
         String timestamp = String.valueOf(System.currentTimeMillis());
         // 获取随机数
@@ -29,15 +29,15 @@ public class FushengApiClient {
         </#if>
         <#if method == "POST">
         HttpRequest request = HttpRequest.post(url)
-        </#if>
-                .header("AccessKey", accessKey)
-                .header("Timestamp", timestamp)
-                .header("Sign", sign)
-                .header("Nonce", nonce);
+                </#if>
+            .header("AccessKey", accessKey)
+            .header("Timestamp", timestamp)
+            .header("Sign", sign)
+            .header("Nonce", nonce);
 
         // 设置请求信息
-         request = request.headerMap(headers, true);
-         request = request.formStr(params);
+        request = request.headerMap(headers, true);
+        request = request.formStr(params);
 
 
         try (HttpResponse response = request.execute()) {

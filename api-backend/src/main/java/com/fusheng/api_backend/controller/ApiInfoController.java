@@ -93,6 +93,7 @@ public class ApiInfoController {
 
         return BaseResponse.success(apiInfoService.generateSdk(id));
     }
+
     @Operation(summary = "修改sdk")
     @PostMapping("/updateApiSdk")
     @SaCheckLogin

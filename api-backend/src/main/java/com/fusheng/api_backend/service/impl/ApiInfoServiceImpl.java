@@ -16,7 +16,6 @@ import com.fusheng.common.model.dto.ApiInfo.ApiInfoSavaOrUpdateDTO;
 import com.fusheng.common.model.dto.ApiInfo.ApiInfoUpdateSdkDTO;
 import com.fusheng.common.model.entity.ApiInfo;
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.annotation.Resource;
@@ -164,7 +163,7 @@ public class ApiInfoServiceImpl implements ApiInfoService {
     synchronized public String generateSdk(Long id) {
         //获取接口信息
         ApiInfo apiInfo = this.getById(id);
-        String sdkPath = System.getProperty("user.dir") + "/sdk/" ;
+        String sdkPath = System.getProperty("user.dir") + "/sdk/";
         try {
             //清空原目录
             FileUtil.clean(sdkPath);
@@ -214,8 +213,8 @@ public class ApiInfoServiceImpl implements ApiInfoService {
     private void mavenToPackage(String src) throws IOException, InterruptedException {
         // 清理之前的构建并打包
         // 注意不同操作系统，执行的命令不同
-        String winMavenCommand = "mvn.cmd clean package -DskipTests=true" ;
-        String otherMavenCommand = "mvn clean package -DskipTests=true" ;
+        String winMavenCommand = "mvn.cmd clean package -DskipTests=true";
+        String otherMavenCommand = "mvn clean package -DskipTests=true";
 
         //判断当前操作是不是Windows
         String osName = System.getProperty("os.name").toLowerCase();

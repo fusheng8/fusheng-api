@@ -6,20 +6,15 @@ spring:
   application:
     name: api-gateway
   profiles:
-    active: prod
+    active: dev
   data:
     redis:
       host: 127.0.0.1
       port: 6379
       database: 3
+
   cloud:
     gateway:
-      routes:
-        - id: path_route
-          uri: https://api.52vmy.cn
-          predicates:
-            - Path=/**
-
       globalcors: # 全局的跨域处理
         add-to-simple-url-handler-mapping: true # 解决options请求被拦截问题
         corsConfigurations:
@@ -37,19 +32,8 @@ spring:
             allowedHeaders: "*" # 允许在请求中携带的头信息
             allowCredentials: true # 是否允许携带cookie
             maxAge: 360000 # 这次跨域检测的有效期
-logging:
-  level:
-    org:
-      springframework:
-        cloud:
-          gateway: trace
-
-dubbo:
-  application:
-    name: api-gateway
-  protocol:
-    name: dubbo
-    port: 9566
-  registry:
-    id: nacos
-    address: nacos://127.0.0.1:8848
+      routes:
+        - id: path_route
+          uri: http://baidu.com
+          predicates:
+            - Path=/**
