@@ -60,5 +60,11 @@ public class RedisKey {
      */
     public static final String CODE_RESET_PASSWORD_CODE = COMMON_PREFIX + "code:" + "code_reset_password_code:";
 
+    /**
+     * api布隆过滤器
+     */
+    public static final String API_BLOOM_FILTER = COMMON_PREFIX + "api_info:" + "api_bloom_filter";
+
+
 }
 

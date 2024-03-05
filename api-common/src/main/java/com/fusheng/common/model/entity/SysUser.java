@@ -47,10 +47,16 @@ public class SysUser implements Serializable {
      * 状态
      */
     private Integer userStatus;
+
     /**
      * 积分
      */
     private String balance;
+
+    /**
+     * 积分警告额度
+     */
+    private String balanceLimitWarning;
 
     /**
      * AccessKey

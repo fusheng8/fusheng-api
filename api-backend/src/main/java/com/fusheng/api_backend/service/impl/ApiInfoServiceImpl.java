@@ -20,6 +20,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RBloomFilter;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
@@ -95,7 +96,11 @@ public class ApiInfoServiceImpl implements ApiInfoService {
         else apiInfo.setRequestParams(null);
 
         if (dto.getId() == null) {
-            return apiInfoMapper.insert(apiInfo) > 0;
+            boolean res = apiInfoMapper.insert(apiInfo) > 0;
+            //在布隆过滤器中添加
+            RBloomFilter<String> bloomFilter = redissonClient.getBloomFilter(RedisKey.API_BLOOM_FILTER);
+            bloomFilter.add(apiInfo.getMappingUrl());
+            return res;
         } else {
             int i = apiInfoMapper.updateById(apiInfo);
             if (i > 0) {
@@ -203,6 +208,11 @@ public class ApiInfoServiceImpl implements ApiInfoService {
         apiInfoSavaOrUpdateDTO.setId(dto.getId());
         apiInfoSavaOrUpdateDTO.setSdk(new Gson().toJson(dto.getSdk()));
         this.saveOrUpdate(apiInfoSavaOrUpdateDTO);
+    }
+
+    @Override
+    public List<ApiInfo> getAllList() {
+        return apiInfoMapper.selectList(null);
     }
 
     /**

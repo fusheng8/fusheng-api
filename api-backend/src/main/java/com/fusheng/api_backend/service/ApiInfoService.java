@@ -77,4 +77,10 @@ public interface ApiInfoService {
      * @param dto
      */
     void updateSdk(ApiInfoUpdateSdkDTO dto);
+
+    /**
+     * 获取所有接口信息
+     * @return
+     */
+    List<ApiInfo> getAllList();
 }

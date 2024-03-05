@@ -1,4 +1,4 @@
-package com.fusheng.api_gateway;
+package com.fusheng.api_gateway.filter;
 
 import com.fusheng.GatewayService;
 import com.fusheng.common.model.entity.ApiInfo;
@@ -57,7 +57,6 @@ public class BalanceFilter implements GlobalFilter, Ordered {
         HttpHeaders headers = request.getHeaders();
         String path = request.getPath().toString();
         String accessKey = headers.getFirst("AccessKey");
-
 
         SysUser user = gatewayService.getUserByAccessKey(accessKey);
         ApiInfo apiInfo = gatewayService.getApiInfoByMappingUrl(path);

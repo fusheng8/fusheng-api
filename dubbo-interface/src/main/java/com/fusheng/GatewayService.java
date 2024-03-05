@@ -5,6 +5,8 @@ import com.fusheng.common.model.entity.KVPair;
 import com.fusheng.common.model.entity.RequestLogs;
 import com.fusheng.common.model.entity.SysUser;
 
+import java.util.List;
+
 public interface GatewayService {
 
     /**
@@ -24,6 +26,12 @@ public interface GatewayService {
     ApiInfo getApiInfoByMappingUrl(String mappingUrl);
 
     /**
+     * 获取所有api信息
+     * @return
+     */
+    List<ApiInfo> getAllApiInfo();
+
+    /**
      * 改变用户余额
      *
      * @param userId
@@ -32,5 +40,10 @@ public interface GatewayService {
      */
     KVPair<Boolean, String> changeUserBalance(long userId, ApiInfo apiInfo);
 
+    /**
+     * 保存请求日志
+     *
+     * @param requestLogs
+     */
     void saveRequestLogs(RequestLogs requestLogs);
 }

@@ -45,4 +45,11 @@ public class SysUserSaveDTO implements Serializable {
      * 状态
      */
     private Byte userStatus;
+
+
+    /**
+     * 积分警告额度
+     */
+    private String balanceLimitWarning;
+
 }

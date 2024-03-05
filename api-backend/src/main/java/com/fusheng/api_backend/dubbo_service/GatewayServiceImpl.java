@@ -15,6 +15,8 @@ import javafx.util.Pair;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @DubboService
 @Transactional(rollbackFor = Exception.class)
 public class GatewayServiceImpl implements GatewayService {
@@ -47,6 +49,16 @@ public class GatewayServiceImpl implements GatewayService {
     @Override
     public ApiInfo getApiInfoByMappingUrl(String mappingUrl) {
         return apiInfoService.getByMappingUrl(mappingUrl);
+    }
+
+    /**
+     * 获取所有api信息
+     *
+     * @return
+     */
+    @Override
+    public List<ApiInfo> getAllApiInfo() {
+        return apiInfoService.getAllList();
     }
 
     /**

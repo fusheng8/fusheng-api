@@ -1,4 +1,4 @@
-package com.fusheng.api_gateway;
+package com.fusheng.api_gateway.filter;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.crypto.digest.DigestAlgorithm;
@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.reactivestreams.Publisher;
+import org.redisson.api.RBloomFilter;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -68,6 +69,12 @@ public class AuthenticateFilter implements GlobalFilter, Ordered {
         String path = request.getPath().toString();
 
         // 判断是否存在该接口
+        //先在布隆过滤器中查找
+        RBloomFilter<String> bloomFilter = redissonClient.getBloomFilter(RedisKey.API_BLOOM_FILTER);
+        if (!bloomFilter.contains(path)) {
+            return authenticateFailed(response, "接口不存在");
+        }
+        //数据库中二次确认
         ApiInfo apiInfo = gatewayService.getApiInfoByMappingUrl(path);
         if (apiInfo == null) {
             return authenticateFailed(response, "接口不存在");
@@ -93,7 +100,6 @@ public class AuthenticateFilter implements GlobalFilter, Ordered {
         if (user != null && !authenticate(accessKey, user.getSecretKey(), timestamp, nonce, sign)) {
             return authenticateFailed(response, "认证失败");
         }
-
 
         BigInteger bigInteger1 = new BigInteger(user.getBalance());
         BigInteger bigInteger2 = new BigInteger(apiInfo.getReduceBalance());
