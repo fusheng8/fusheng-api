@@ -48,8 +48,8 @@ public class SysUserSaveDTO implements Serializable {
 
 
     /**
-     * 积分警告额度
+     * 积分通知额度
      */
-    private String balanceLimitWarning;
+    private String balanceLimitNotice;
 
 }

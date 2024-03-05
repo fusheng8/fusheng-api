@@ -25,6 +25,8 @@ public class MailServiceImpl implements MailService {
     private static final long EMAIL_LOGIN_CODE_EXPIRE = 5L;
     //重置密码验证码时效
     private static final long RESET_PASSWORD_CODE_EXPIRE = 5L;
+    //积分不足提醒时效
+    private static final long BALANCE_NOTICE_EXPIRE = 5L;
     @Resource
     private RedissonClient redissonClient;
     @Resource
@@ -88,6 +90,17 @@ public class MailServiceImpl implements MailService {
         sendCodeEmail(email, code, "重置密码", RESET_PASSWORD_CODE_EXPIRE);
         //将验证码存入redis
         bucket.set(code, RESET_PASSWORD_CODE_EXPIRE, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public void sendBalanceNotice(String email) {
+        String code = RandomUtil.randomNumbers(6);
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(from);
+        message.setTo(email);
+        message.setSubject("积分不足一下");
+        message.setText("您的积分不足，请及时充值。");
+        mailSender.send(message);
     }
 
     private void sendCodeEmail(String email, String code, String operate, long expire) {

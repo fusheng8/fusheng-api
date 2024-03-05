@@ -29,4 +29,11 @@ public interface MailService {
      * @param email
      */
     void sendResetPasswordCode(String email);
+
+    /**
+     * 发送积分不足题目
+     *
+     * @param email
+     */
+    void sendBalanceNotice(String email);
 }

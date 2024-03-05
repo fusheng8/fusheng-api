@@ -56,7 +56,7 @@ public class SysUser implements Serializable {
     /**
      * 积分警告额度
      */
-    private String balanceLimitWarning;
+    private String balanceLimitNotice;
 
     /**
      * AccessKey

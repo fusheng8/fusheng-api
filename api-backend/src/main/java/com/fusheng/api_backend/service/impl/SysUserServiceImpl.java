@@ -25,6 +25,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -225,6 +226,12 @@ public class SysUserServiceImpl implements SysUserService {
                     user.setUpdateTime(LocalDateTime.now());
                     user.setUpdateBy(user.getId());
                     sysUserMapper.updateById(user);
+
+                    //检测是否积分不足需要提醒
+                    if (new BigDecimal(user.getBalance()).compareTo(new BigDecimal(user.getBalanceLimitNotice()))>0){
+                        //todo 发送邮件或者短信提醒
+                    }
+
                     //修改用户缓存
                     redissonClient.getBucket(RedisKey.USER_BY_ID + userId).set(user);
                 } else {
