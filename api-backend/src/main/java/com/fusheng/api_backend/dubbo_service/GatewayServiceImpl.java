@@ -11,7 +11,6 @@ import com.fusheng.common.model.entity.KVPair;
 import com.fusheng.common.model.entity.RequestLogs;
 import com.fusheng.common.model.entity.SysUser;
 import jakarta.annotation.Resource;
-import javafx.util.Pair;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,11 +70,11 @@ public class GatewayServiceImpl implements GatewayService {
     @Override
     public KVPair<Boolean, String> changeUserBalance(long userId, ApiInfo apiInfo) {
         String amount = apiInfo.getReduceBalance();
-        Pair<Boolean, String> b1 = userService.deductUserBalance(userId, false, amount);
+        KVPair<Boolean, String> b1 = userService.deductUserBalance(userId, false, amount);
         if (!b1.getKey()) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "扣除失败");
         }
-        Pair<Boolean, String> b2 = userService.deductUserBalance(apiInfo.getUserId(), true, amount);
+        KVPair<Boolean, String> b2 = userService.deductUserBalance(apiInfo.getUserId(), true, amount);
         if (!b2.getKey()) {
             userService.deductUserBalance(userId, true, amount);
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "扣除失败");

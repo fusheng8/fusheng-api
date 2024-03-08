@@ -13,9 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.reactivestreams.Publisher;
-import org.redisson.api.RBloomFilter;
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
+import org.redisson.api.*;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.RouteToRequestUrlFilter;
@@ -85,6 +83,21 @@ public class AuthenticateFilter implements GlobalFilter, Ordered {
             return authenticateFailed(response, "接口状态异常");
         }
 
+        //限流
+        RRateLimiter rateLimiter = redissonClient.getRateLimiter(RedisKey.API_RATE_LIMITER + path);
+        Long rate = rateLimiter.getConfig().getRate();
+        rateLimiter.trySetRate(RateType.OVERALL, apiInfo.getMaxQps(), 1, RateIntervalUnit.SECONDS);
+        //判断是否需要更新限流器
+        if (!apiInfo.getMaxQps().equals(rate)) {
+            rateLimiter.setRate(RateType.OVERALL, apiInfo.getMaxQps(), 1, RateIntervalUnit.SECONDS);
+        }
+
+        //判断限流
+        if (apiInfo.getMaxQps() > 0 && !rateLimiter.tryAcquire(5, TimeUnit.SECONDS)) {
+            return authenticateFailed(response, "接口访问量过大，请稍后再试");
+        }
+
+        rateLimiter.trySetRate(RateType.OVERALL, apiInfo.getMaxQps(), 1, RateIntervalUnit.SECONDS);
         HttpHeaders headers = request.getHeaders();
         String accessKey = headers.getFirst("AccessKey");
         String timestamp = headers.getFirst("Timestamp");

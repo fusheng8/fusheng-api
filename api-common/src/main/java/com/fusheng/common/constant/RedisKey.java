@@ -65,6 +65,9 @@ public class RedisKey {
      */
     public static final String API_BLOOM_FILTER = COMMON_PREFIX + "api_info:" + "api_bloom_filter";
 
-
+    /**
+     * api限流器
+     */
+    public static final String API_RATE_LIMITER = COMMON_PREFIX + "api_info:" + "api_rate_limiter:";
 }
 

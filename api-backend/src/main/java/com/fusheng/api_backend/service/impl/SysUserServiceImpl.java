@@ -12,11 +12,6 @@ import com.fusheng.api_backend.service.SysUserService;
 import com.fusheng.api_backend.utils.PasswordUtil;
 import com.fusheng.common.constant.RedisKey;
 import com.fusheng.common.model.dto.SysUser.*;
-import com.fusheng.common.model.entity.SysUser;
-import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
-import com.google.gson.Gson;
-import jakarta.annotation.Resource;
-import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBucket;
@@ -205,7 +200,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public Pair<Boolean, String> deductUserBalance(long userId, boolean isAdd, String amount) {
+    public KVPair<Boolean, String> deductUserBalance(long userId, boolean isAdd, String amount) {
         // 对用户加锁
         RLock lock = redissonClient.getLock(RedisKey.USER_BALANCE_LOCK + userId);
         try {
@@ -228,14 +223,14 @@ public class SysUserServiceImpl implements SysUserService {
                     sysUserMapper.updateById(user);
 
                     //检测是否积分不足需要提醒
-                    if (new BigDecimal(user.getBalance()).compareTo(new BigDecimal(user.getBalanceLimitNotice()))>0){
+                    if (new BigDecimal(user.getBalance()).compareTo(new BigDecimal(user.getBalanceLimitNotice())) > 0) {
                         //todo 发送邮件或者短信提醒
                     }
 
                     //修改用户缓存
                     redissonClient.getBucket(RedisKey.USER_BY_ID + userId).set(user);
                 } else {
-                    return new Pair<>(false, "余额不足");
+                    return new KVPair<>(false, "余额不足");
                 }
             }
         } catch (InterruptedException e) {
@@ -247,7 +242,7 @@ public class SysUserServiceImpl implements SysUserService {
                 lock.unlock();
             }
         }
-        return new Pair<>(true, null);
+        return new KVPair<>(true, null);
     }
 
     @Override

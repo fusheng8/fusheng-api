@@ -27,6 +27,7 @@ public interface GatewayService {
 
     /**
      * 获取所有api信息
+     *
      * @return
      */
     List<ApiInfo> getAllApiInfo();

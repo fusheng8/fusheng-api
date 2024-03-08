@@ -94,6 +94,12 @@ public class ApiInfo implements Serializable {
      */
     private String sdk;
 
+
+    /**
+     * 最大QPS
+     */
+    private Long maxQps;
+
     /**
      * 是否删除(0-未删, 1-已删)
      */

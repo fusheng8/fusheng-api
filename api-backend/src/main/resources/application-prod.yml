@@ -11,6 +11,7 @@ spring:
       host: localhost
       port: 6379
       database: 3
+      password: 123456
   mail:
     # 邮件配置信息
     # 163邮箱的SMTP服务器配置

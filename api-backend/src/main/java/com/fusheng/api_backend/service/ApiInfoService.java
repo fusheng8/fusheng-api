@@ -80,6 +80,7 @@ public interface ApiInfoService {
 
     /**
      * 获取所有接口信息
+     *
      * @return
      */
     List<ApiInfo> getAllList();

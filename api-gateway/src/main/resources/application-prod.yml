@@ -10,6 +10,7 @@ spring:
       host: 127.0.0.1
       port: 6379
       database: 3
+      password: 123456
 
 logging:
   level:

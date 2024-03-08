@@ -98,7 +98,7 @@ public class MailServiceImpl implements MailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
         message.setTo(email);
-        message.setSubject("积分不足一下");
+        message.setSubject("积分不足");
         message.setText("您的积分不足，请及时充值。");
         mailSender.send(message);
     }

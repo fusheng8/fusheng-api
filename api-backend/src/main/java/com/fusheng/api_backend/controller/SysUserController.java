@@ -15,6 +15,7 @@ import com.fusheng.api_backend.service.WithdrawService;
 import com.fusheng.common.model.dto.SysUser.*;
 import com.fusheng.common.model.dto.withdraw.WithdrawDTO;
 import com.fusheng.common.model.entity.BalanceOrder;
+import com.fusheng.common.model.entity.KVPair;
 import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.entity.Withdraw;
 import com.fusheng.common.model.vo.SysUser.SysUserInfoVO;
@@ -25,7 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
-import javafx.util.Pair;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -222,7 +222,7 @@ public class SysUserController {
         withdraw.setStatus(1);
 
         // 扣除用户积分
-        Pair<Boolean, String> pair = sysUserService.deductUserBalance(StpUtil.getLoginIdAsLong(), false, dto.getAmount());
+        KVPair<Boolean, String> pair = sysUserService.deductUserBalance(StpUtil.getLoginIdAsLong(), false, dto.getAmount());
         if (!pair.getKey()) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, pair.getValue());
         }

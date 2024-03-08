@@ -2,9 +2,9 @@ package com.fusheng.api_backend.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fusheng.common.model.dto.SysUser.*;
+import com.fusheng.common.model.entity.KVPair;
 import com.fusheng.common.model.entity.SysUser;
 import com.fusheng.common.model.vo.SysUser.SysUserLoginVO;
-import javafx.util.Pair;
 
 import java.util.List;
 
@@ -61,7 +61,7 @@ public interface SysUserService {
      * @param amount
      * @return
      */
-    Pair<Boolean, String> deductUserBalance(long userId, boolean isAdd, String amount);
+    KVPair<Boolean, String> deductUserBalance(long userId, boolean isAdd, String amount);
 
     /**
      * 批量删除用户
