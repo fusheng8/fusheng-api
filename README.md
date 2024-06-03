@@ -1,13 +1,13 @@
-基于[Pure Admin](https://yiming_chang.gitee.io/pure-admin-doc/)实现的一套与之对接的java后端初始化模板
-
+聚合API开放平台
 后端技术栈
 
 - SpringBoot 3
+- SpringMvc
 - Mybatis Plus
-- Hutool
 - Sa-token
-- knife4j
-- commons-lang3
+- Gateway
+- Dubbo
+- Nacos
 
 运行环境
 
